@@ -1,5 +1,5 @@
 import React from 'react';
-import { Point } from '../converters/point';
+import { Point } from './point';
 
 interface SvgCircleProps {
   position: Point;
@@ -7,7 +7,7 @@ interface SvgCircleProps {
   fill?: string;
 }
 
-export const SvgCircle: React.FC<SvgCircleProps> = props => {
+export const SvgCircle: React.FC<SvgCircleProps> = (props) => {
   const x = props.position.x;
   const y = props.position.y;
   const fill = props.fill || 'black';

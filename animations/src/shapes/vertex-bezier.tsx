@@ -1,7 +1,7 @@
 import React from 'react';
-import { Point, addPoint, scale } from '../converters/point';
-import { SvgPathCommand, CurveRel } from './svg-path-commands';
+import { addPoint, Point, scale } from './point';
 import { SvgPath } from './svg-path';
+import { CurveRel, SvgPathCommand } from './svg-path-commands';
 
 export interface Vertex {
   position: Point;
@@ -21,7 +21,7 @@ export const Smooth = (position: Point, gradient: Point): Vertex => {
   return {
     position,
     gradient,
-    draw
+    draw,
   };
 };
 
@@ -34,7 +34,7 @@ interface VertexBezierProps {
   showMarkers?: boolean;
 }
 
-export const VertexBezier: React.FC<VertexBezierProps> = props => {
+export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
   const start = props.start.position;
   const allPoints = [props.start, ...props.subsequent];
   const commands = allPoints
