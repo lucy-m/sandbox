@@ -1,5 +1,5 @@
 import React from 'react';
-import { Point, addPoint } from '../converters/point';
+import { addPoint, Point } from './point';
 import SvgCircle from './svg-circle';
 import SvgLine from './svg-line';
 
@@ -7,7 +7,7 @@ const markerSize = 1.5;
 const markerColours = {
   move: 'black',
   line: 'red',
-  curve: 'blue'
+  curve: 'blue',
 };
 
 export interface SvgPathCommand {

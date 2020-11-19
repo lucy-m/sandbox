@@ -1,6 +1,6 @@
 import React from 'react';
-import { SvgPathCommand, MoveAbs } from './svg-path-commands';
-import { Point } from '../converters/point';
+import { Point } from './point';
+import { MoveAbs, SvgPathCommand } from './svg-path-commands';
 
 interface SvgPathProps {
   start: Point;
@@ -8,7 +8,7 @@ interface SvgPathProps {
   showMarkers?: boolean;
 }
 
-export const SvgPath: React.FC<SvgPathProps> = props => {
+export const SvgPath: React.FC<SvgPathProps> = (props) => {
   const initial = MoveAbs(props.start);
   const d = props.commands.reduce(
     (str, command) => str + command.draw(),
@@ -22,12 +22,12 @@ export const SvgPath: React.FC<SvgPathProps> = props => {
     ({ segmentStart, acc }, command, i) => {
       return {
         segmentStart: command.move(segmentStart),
-        acc: acc.concat(<g key={i + 1}>{command.markers(segmentStart)}</g>)
+        acc: acc.concat(<g key={i + 1}>{command.markers(segmentStart)}</g>),
       };
     },
     {
       segmentStart: props.start,
-      acc: [<g key={0}>{initial.markers(props.start)}</g>]
+      acc: [<g key={0}>{initial.markers(props.start)}</g>],
     }
   ).acc;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Point } from '../converters/point';
+import { Point } from './point';
 
 interface SvgLineProps {
   start: Point;
@@ -7,7 +7,7 @@ interface SvgLineProps {
   stroke?: string;
 }
 
-export const SvgLine: React.FC<SvgLineProps> = props => {
+export const SvgLine: React.FC<SvgLineProps> = (props) => {
   const start = props.start;
   const end = props.end;
   const stroke = props.stroke || 'black';
