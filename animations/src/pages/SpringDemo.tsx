@@ -1,7 +1,7 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { Point } from '../shapes';
+import { Point, Zero } from '../shapes';
 import { getMouseEventCoords } from '../util/getMouseEventCoOrds';
 import './Spring.css';
 import { makeSpringBezierMaker, SpringBezier } from './SpringBezier';
@@ -31,10 +31,10 @@ export const SpringDemo: React.FC = () => {
   const start = bezierMaker({ x: 10, y: 60 });
   const subsequent = [
     bezierMaker({ x: 100, y: 24 }),
-    bezierMaker({ x: 120, y: 80 }, { x: 20, y: -8 }),
-    bezierMaker({ x: 180, y: 60 }, { x: 12, y: 12 }),
+    bezierMaker({ x: 120, y: 80 }, { x: 20, y: 3 }),
+    bezierMaker({ x: 180, y: 60 }, { x: 12, y: 12 }, Zero),
     bezierMaker({ x: 170, y: 160 }, { x: 40, y: 0 }),
-    bezierMaker({ x: 210, y: 55 }, { x: 20, y: -10 }),
+    bezierMaker({ x: 210, y: 55 }, Zero, { x: -20, y: 10 }),
     bezierMaker({ x: 300, y: 100 }),
     bezierMaker({ x: 300, y: 150 }),
     bezierMaker({ x: 270, y: 150 }, { x: -45, y: -100 }),

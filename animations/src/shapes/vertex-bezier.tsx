@@ -5,25 +5,34 @@ import { CurveRel, SvgPathCommand } from './svg-path-commands';
 
 export interface Vertex {
   position: Point;
-  gradient: Point;
+  inGrad: Point;
+  outGrad: Point;
   draw: (next: Vertex) => SvgPathCommand;
 }
 
-export const Smooth = (position: Point, gradient: Point): Vertex => {
+export const SmoothAsymm = (
+  position: Point,
+  inGrad: Point,
+  outGrad: Point
+): Vertex => {
   const draw = (next: Vertex): SvgPathCommand => {
     const dp = addPoint(next.position, scale(position, -1));
-    const startControlRel = gradient;
-    const endControlRel = scale(next.gradient, -1);
+    const startControlRel = inGrad;
+    const endControlRel = next.outGrad;
 
     return CurveRel(dp, startControlRel, endControlRel);
   };
 
   return {
     position,
-    gradient,
+    inGrad,
+    outGrad,
     draw,
   };
 };
+
+export const Smooth = (position: Point, gradient: Point): Vertex =>
+  SmoothAsymm(position, gradient, scale(gradient, -1));
 
 export const Sharp = (position: Point): Vertex =>
   Smooth(position, { x: 0, y: 0 });

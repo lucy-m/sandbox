@@ -2,15 +2,23 @@ import React from 'react';
 import { Observable } from 'rxjs';
 import { Point, Zero } from '../shapes';
 import { Spring, SpringFn, SpringProperties } from '../shapes/spring';
-import { Sharp, Smooth, Vertex, VertexBezier } from '../shapes/vertex-bezier';
+import {
+  Sharp,
+  Smooth,
+  SmoothAsymm,
+  Vertex,
+  VertexBezier,
+} from '../shapes/vertex-bezier';
 
 export interface SpringBezierVertex extends Spring {
-  gradient?: Point;
+  outGradient?: Point;
+  inGradient?: Point;
 }
 
 export const makeSpringBezierMaker = (properties: SpringProperties) => (
   position: Point,
-  gradient?: Point
+  outGradient?: Point,
+  inGradient?: Point
 ): SpringBezierVertex => {
   const r = () => Math.random() * 0.2 + 0.9;
   const permutedProperties: SpringProperties = {
@@ -20,12 +28,17 @@ export const makeSpringBezierMaker = (properties: SpringProperties) => (
   };
   return {
     ...SpringFn.makeSpring(position, Zero, position, permutedProperties),
-    gradient,
+    outGradient,
+    inGradient,
   };
 };
 
 const toVertex = (s: SpringBezierVertex): Vertex =>
-  s.gradient ? Smooth(s.position, s.gradient) : Sharp(s.position);
+  s.outGradient
+    ? s.inGradient
+      ? SmoothAsymm(s.position, s.outGradient, s.inGradient)
+      : Smooth(s.position, s.outGradient)
+    : Sharp(s.position);
 
 interface SpringBezierProps {
   start: SpringBezierVertex;
