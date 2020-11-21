@@ -5,9 +5,14 @@ import { CurveRel, SvgPathCommand } from './svg-path-commands';
 
 export interface Vertex {
   position: Point;
-  inGrad: Point;
   outGrad: Point;
+  inGrad: Point;
   draw: (next: Vertex) => SvgPathCommand;
+}
+
+export interface VertexShape {
+  start: Vertex;
+  subsequent: Vertex[];
 }
 
 export const SmoothAsymm = (
@@ -17,8 +22,8 @@ export const SmoothAsymm = (
 ): Vertex => {
   const draw = (next: Vertex): SvgPathCommand => {
     const dp = addPoint(next.position, scale(position, -1));
-    const startControlRel = inGrad;
-    const endControlRel = next.outGrad;
+    const startControlRel = outGrad;
+    const endControlRel = next.inGrad;
 
     return CurveRel(dp, startControlRel, endControlRel);
   };
@@ -38,14 +43,13 @@ export const Sharp = (position: Point): Vertex =>
   Smooth(position, { x: 0, y: 0 });
 
 interface VertexBezierProps {
-  start: Vertex;
-  subsequent: Array<Vertex>;
+  shape: VertexShape;
   showMarkers?: boolean;
 }
 
 export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
-  const start = props.start.position;
-  const allPoints = [props.start, ...props.subsequent];
+  const start = props.shape.start.position;
+  const allPoints = [props.shape.start, ...props.shape.subsequent];
   const commands = allPoints
     .slice(1)
     .reduce<Array<SvgPathCommand>>((acc, next, i) => {
