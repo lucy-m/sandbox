@@ -1,32 +1,37 @@
 import { addPoint, Point, scale } from './point';
 
+export interface SpringProperties {
+  stiffness: number;
+  friction: number;
+  weight: number;
+}
+
 export interface Spring {
   position: Point;
   velocity: Point;
   endPoint: Point;
-  stiffness: number;
-  friction: number;
-  weight: number;
+  properties: SpringProperties;
 }
 
 const makeSpring = (
   position: Point,
   velocity: Point,
   endPoint: Point,
-  stiffness: number,
-  friction: number,
-  weight: number
+  properties: SpringProperties
 ): Spring => ({
   position,
   velocity,
   endPoint,
-  stiffness,
-  friction,
-  weight,
+  properties,
 });
 
 const tick = (spring: Spring, dt: number): Spring => {
-  const { position, velocity, endPoint, stiffness, friction, weight } = spring;
+  const {
+    position,
+    velocity,
+    endPoint,
+    properties: { stiffness, friction, weight },
+  } = spring;
 
   const d = addPoint(position, scale(endPoint, -1));
   const springAcc = scale(d, -stiffness / weight);
@@ -45,6 +50,16 @@ const setEndPoint = (spring: Spring, p: Point): Spring => ({
   endPoint: p,
 });
 
+const nudgeEndPoint = (spring: Spring, dp: Point): Spring => ({
+  ...spring,
+  endPoint: addPoint(spring.endPoint, dp),
+});
+
+const setVelocity = (spring: Spring, v: Point): Spring => ({
+  ...spring,
+  velocity: v,
+});
+
 const setPosition = (spring: Spring, p: Point): Spring => ({
   ...spring,
   position: p,
@@ -54,5 +69,7 @@ export const SpringFn = {
   makeSpring,
   tick,
   setEndPoint,
+  nudgeEndPoint,
+  setVelocity,
   setPosition,
 };
