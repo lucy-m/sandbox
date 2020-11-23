@@ -48,8 +48,10 @@ interface VertexBezierProps {
 }
 
 export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
-  const start = props.shape.start.position;
-  const allPoints = [props.shape.start, ...props.shape.subsequent];
+  const { shape } = props;
+
+  const start = shape.start.position;
+  const allPoints = [shape.start, ...shape.subsequent];
   const commands = allPoints
     .slice(1)
     .reduce<Array<SvgPathCommand>>((acc, next, i) => {

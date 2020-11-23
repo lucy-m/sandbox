@@ -1,6 +1,6 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { Point, Zero } from '../shapes';
+import { addPoint, Point, Zero } from '../shapes';
 import { Spring, SpringFn, SpringProperties } from '../shapes/spring';
 import {
   SmoothAsymm,
@@ -36,9 +36,9 @@ export const makeSpringBezierMaker = (properties: SpringProperties) => (
   };
 };
 
-const toVertex = (s: SpringBezierVertex): Vertex =>
+const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
   SmoothAsymm(
-    s.position.position,
+    addPoint(s.position.position, origin),
     s.inGradient.position,
     s.outGradient.position
   );
@@ -50,6 +50,7 @@ export interface SpringBezierShape {
 
 interface SpringBezierProps {
   initial: SpringBezierShape;
+  origin?: Point;
   timer: Observable<number>;
   started: boolean;
   nudge?: Observable<Point>;
@@ -71,6 +72,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   props: SpringBezierProps
 ) => {
   const { timer, started, nudge, morph } = props;
+  const origin = props.origin ?? Zero;
 
   const [start, setStart] = React.useState<SpringBezierVertex>(
     props.initial.start
@@ -145,8 +147,8 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   });
 
   const shape: VertexShape = {
-    start: toVertex(start),
-    subsequent: subsequent.map(toVertex),
+    start: toVertex(start, origin),
+    subsequent: subsequent.map((s) => toVertex(s, origin)),
   };
 
   return <VertexBezier shape={shape} showMarkers={false} />;

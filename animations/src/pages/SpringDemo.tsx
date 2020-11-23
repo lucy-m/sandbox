@@ -22,9 +22,9 @@ const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));
 
 const bezierMaker = makeSpringBezierMaker({
-  friction: 70,
-  stiffness: 12,
-  weight: 10,
+  friction: 30,
+  stiffness: 3,
+  weight: 5,
 });
 
 const vertexShapeToSpringBezier = (
@@ -66,6 +66,8 @@ export const SpringDemo: React.FC = () => {
   const morphA = () => shapeMorph.next(letters.A);
   const morphB = () => shapeMorph.next(letters.B);
   const morphC = () => shapeMorph.next(letters.C);
+  const morphD = () => shapeMorph.next(letters.D);
+  const morphE = () => shapeMorph.next(letters.E);
 
   return (
     <div>
@@ -84,6 +86,7 @@ export const SpringDemo: React.FC = () => {
         />
         <SpringBezier
           initial={vertexShapeToSpringBezier(letters.A)}
+          origin={{ x: 100, y: 300 }}
           timer={timer}
           started={started}
           morph={shapeMorph}
@@ -99,6 +102,8 @@ export const SpringDemo: React.FC = () => {
       <button onClick={morphA}>Morph A</button>
       <button onClick={morphB}>Morph B</button>
       <button onClick={morphC}>Morph C</button>
+      <button onClick={morphD}>Morph D</button>
+      <button onClick={morphE}>Morph E</button>
     </div>
   );
 };
