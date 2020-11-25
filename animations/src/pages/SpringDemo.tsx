@@ -69,6 +69,7 @@ export const SpringDemo: React.FC = () => {
   const morphD = () => shapeMorph.next(letters.D);
   const morphE = () => shapeMorph.next(letters.E);
   const morphF = () => shapeMorph.next(letters.F);
+  const morphI = () => shapeMorph.next(letters.I);
 
   return (
     <div>
@@ -106,6 +107,7 @@ export const SpringDemo: React.FC = () => {
         <button onClick={morphD}>Morph D</button>
         <button onClick={morphE}>Morph E</button>
         <button onClick={morphF}>Morph F</button>
+        <button onClick={morphI}>Morph I</button>
       </div>
     </div>
   );

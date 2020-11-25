@@ -8,7 +8,7 @@ import {
   VertexBezier,
   VertexShape,
 } from '../shapes/vertex-bezier';
-import { spacedFullZip } from './spring/zip';
+import { innerZip, spacedFullZip } from './spring/zip';
 
 export interface SpringBezierVertex {
   position: Spring;
@@ -139,7 +139,22 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
         return { position, inGradient, outGradient, deleted };
       };
 
-      const springs = [start, ...subsequent].filter((s) => !s.deleted);
+      // need to reset the outGradient for springs that are
+      // immediately before a deleted one
+      const springs = innerZip([start, ...subsequent], subsequent)
+        .map(([spring, next]) => {
+          if (next.deleted) {
+            const outGradient = SpringFn.setPositionAndEndpoint(
+              spring.outGradient,
+              next.outGradient.position
+            );
+            return { ...spring, outGradient };
+          } else {
+            return spring;
+          }
+        })
+        .concat(subsequent.slice(-1)[0])
+        .filter((s) => !s.deleted);
       const zipped = spacedFullZip(springs, [shape.start, ...shape.subsequent]);
 
       const startSpringPairing = (() => {
@@ -178,16 +193,38 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
           }
         ).subsequent;
 
-        // need to remove out-gradients for all springs
-        // where the next spring is deleted
-
         const morphedStart = morphOne(
           startSpringPairing.spring,
           startSpringPairing.vertex,
           false
         );
-        setStart(morphedStart);
-        setSubsequent(morphedSubsequent);
+
+        // need to remove out-gradients for all springs
+        // where the next spring is deleted
+        const correctGradient = (
+          spring: SpringBezierVertex,
+          next: SpringBezierVertex
+        ): SpringBezierVertex => {
+          if (next.deleted) {
+            const outGradient = SpringFn.setEndPoint(spring.outGradient, Zero);
+            return { ...spring, outGradient };
+          } else {
+            return spring;
+          }
+        };
+
+        const gradientCorrectedStart = morphedSubsequent[0]
+          ? correctGradient(morphedStart, morphedSubsequent[0])
+          : morphedStart;
+        const gradientCorrectedSubsequent = innerZip(
+          morphedSubsequent,
+          morphedSubsequent.slice(1)
+        )
+          .map(([spring, next]) => correctGradient(spring, next))
+          .concat(morphedSubsequent.slice(-1)[0]);
+
+        setStart(gradientCorrectedStart);
+        setSubsequent(gradientCorrectedSubsequent);
       }
     });
 
@@ -199,5 +236,5 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     subsequent: subsequent.map((s) => toVertex(s, origin)),
   };
 
-  return <VertexBezier shape={shape} showMarkers={false} />;
+  return <VertexBezier shape={shape} showMarkers={true} />;
 };

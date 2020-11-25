@@ -65,6 +65,9 @@ const setPosition = (spring: Spring, p: Point): Spring => ({
   position: p,
 });
 
+const setPositionAndEndpoint = (spring: Spring, p: Point): Spring =>
+  setEndPoint(setPosition(spring, p), p);
+
 export const SpringFn = {
   makeSpring,
   tick,
@@ -72,4 +75,5 @@ export const SpringFn = {
   nudgeEndPoint,
   setVelocity,
   setPosition,
+  setPositionAndEndpoint,
 };
