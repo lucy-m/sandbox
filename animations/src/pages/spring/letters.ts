@@ -19,22 +19,11 @@ const A = {
 const B: VertexShape = {
   start: Sharp({ x: 0, y: 0 }),
   subsequent: [
-    Sharp({ x: 0, y: -50 }),
     SmoothAsymm({ x: 0, y: -100 }, Zero, { x: 50, y: 0 }),
     SmoothAsymm({ x: 5, y: -60 }, { x: 50, y: 0 }, { x: 60, y: 0 }),
     SmoothAsymm({ x: 5, y: 0 }, { x: 60, y: 0 }, Zero),
   ],
 };
-
-// const C: VertexShape = {
-//   start: SmoothAsymm({ x: 54, y: -84 }, Zero, { x: -20, y: -14 }),
-//   subsequent: [
-//     Smooth({ x: 6, y: -72 }, { x: 6, y: -15 }),
-//     Smooth({ x: 0, y: -42 }, { x: 0, y: -10 }),
-//     Smooth({ x: 6, y: -12 }, { x: -6, y: -15 }),
-//     SmoothAsymm({ x: 54, y: 0 }, { x: -20, y: 14 }, Zero),
-//   ],
-// };
 
 const C: VertexShape = {
   start: SmoothAsymm({ x: 54, y: -15 }, Zero, { x: -14, y: 14 }),
@@ -49,7 +38,6 @@ const C: VertexShape = {
 const D: VertexShape = {
   start: Sharp({ x: 0, y: 0 }),
   subsequent: [
-    Sharp({ x: 0, y: -50 }),
     SmoothAsymm({ x: 0, y: -100 }, Zero, { x: 40, y: 0 }),
     Smooth({ x: 50, y: -50 }, { x: 0, y: -30 }),
     SmoothAsymm({ x: 5, y: 0 }, { x: 35, y: 0 }, Zero),
@@ -66,10 +54,20 @@ const E: VertexShape = {
   ],
 };
 
+const F: VertexShape = {
+  start: SmoothAsymm({ x: 0, y: 0 }, Zero, { x: 0, y: -50 }),
+  subsequent: [
+    SmoothAsymm({ x: 30, y: -50 }, { x: -30, y: 0 }, { x: -30, y: 0 }),
+    SmoothAsymm({ x: 0, y: -100 }, { x: 0, y: 50 }, Zero),
+    Sharp({ x: 50, y: -100 }),
+  ],
+};
+
 export const letters = {
   A,
   B,
   C,
   D,
   E,
+  F,
 };

@@ -68,6 +68,7 @@ export const SpringDemo: React.FC = () => {
   const morphC = () => shapeMorph.next(letters.C);
   const morphD = () => shapeMorph.next(letters.D);
   const morphE = () => shapeMorph.next(letters.E);
+  const morphF = () => shapeMorph.next(letters.F);
 
   return (
     <div>
@@ -93,17 +94,19 @@ export const SpringDemo: React.FC = () => {
         />
       </svg>
       <div>
-        <ul></ul>
+        <button onClick={startStop}>{started ? 'Stop' : 'Start'}</button>
+        <button onClick={reset}>Reset</button>
+        <button onClick={nudgeUp}>Nudge up</button>
+        <button onClick={nudgeDown}>Nudge down</button>
       </div>
-      <button onClick={startStop}>{started ? 'Stop' : 'Start'}</button>
-      <button onClick={reset}>Reset</button>
-      <button onClick={nudgeUp}>Nudge up</button>
-      <button onClick={nudgeDown}>Nudge down</button>
-      <button onClick={morphA}>Morph A</button>
-      <button onClick={morphB}>Morph B</button>
-      <button onClick={morphC}>Morph C</button>
-      <button onClick={morphD}>Morph D</button>
-      <button onClick={morphE}>Morph E</button>
+      <div>
+        <button onClick={morphA}>Morph A</button>
+        <button onClick={morphB}>Morph B</button>
+        <button onClick={morphC}>Morph C</button>
+        <button onClick={morphD}>Morph D</button>
+        <button onClick={morphE}>Morph E</button>
+        <button onClick={morphF}>Morph F</button>
+      </div>
     </div>
   );
 };

@@ -8,11 +8,13 @@ import {
   VertexBezier,
   VertexShape,
 } from '../shapes/vertex-bezier';
+import { spacedFullZip } from './spring/zip';
 
 export interface SpringBezierVertex {
   position: Spring;
   outGradient: Spring;
   inGradient: Spring;
+  deleted: boolean;
 }
 
 export const makeSpringBezierMaker = (properties: SpringProperties) => (
@@ -33,6 +35,7 @@ export const makeSpringBezierMaker = (properties: SpringProperties) => (
     position: makeSpring(vertex.position),
     inGradient: makeSpring(vertex.inGrad),
     outGradient: makeSpring(vertex.outGrad),
+    deleted: false,
   };
 };
 
@@ -65,7 +68,7 @@ const apply = (
   const inGradient = springs.inGradient && fn(springs.inGradient);
   const outGradient = springs.outGradient && fn(springs.outGradient);
 
-  return { position, inGradient, outGradient };
+  return { position, inGradient, outGradient, deleted: springs.deleted };
 };
 
 export const SpringBezier: React.FC<SpringBezierProps> = (
@@ -108,7 +111,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
           s.outGradient &&
           SpringFn.setVelocity(s.outGradient, { x: r(), y: r() });
 
-        return { position, inGradient, outGradient };
+        return { position, inGradient, outGradient, deleted: s.deleted };
       };
       setStart(apply(start));
       setSubsequent(subsequent.map(apply));
@@ -120,27 +123,72 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     const s = morph?.subscribe((shape: VertexShape) => {
       const morphOne = (
         spring: SpringBezierVertex,
-        vertex: Vertex
+        vertex: Vertex,
+        deleted: boolean
       ): SpringBezierVertex => {
         const position = SpringFn.setEndPoint(spring.position, vertex.position);
         const inGradient = SpringFn.setEndPoint(
           spring.inGradient,
-          vertex.inGrad
+          deleted ? Zero : vertex.inGrad
         );
         const outGradient = SpringFn.setEndPoint(
           spring.outGradient,
           vertex.outGrad
         );
 
-        return { position, inGradient, outGradient };
+        return { position, inGradient, outGradient, deleted };
       };
 
-      const newSubsequent = shape.subsequent
-        .slice(0, subsequent.length)
-        .map((v, i) => morphOne(subsequent[i], v));
+      const springs = [start, ...subsequent].filter((s) => !s.deleted);
+      const zipped = spacedFullZip(springs, [shape.start, ...shape.subsequent]);
 
-      setStart(morphOne(start, shape.start));
-      setSubsequent(newSubsequent);
+      const startSpringPairing = (() => {
+        if (zipped[0] && zipped[0][0] && zipped[0][1]) {
+          return { spring: zipped[0][0], vertex: zipped[0][1] };
+        } else {
+          return undefined;
+        }
+      })();
+
+      if (startSpringPairing) {
+        interface Acc {
+          lastSpring: SpringBezierVertex;
+          lastVertex: Vertex;
+          subsequent: SpringBezierVertex[];
+        }
+
+        const morphedSubsequent = zipped.slice(1).reduce<Acc>(
+          (acc, next) => {
+            const spring = next[0] ?? acc.lastSpring;
+            const vertex = next[1] ?? acc.lastVertex;
+            const deleted = !next[1];
+
+            const morphed = morphOne(spring, vertex, deleted);
+
+            return {
+              lastSpring: spring,
+              lastVertex: vertex,
+              subsequent: acc.subsequent.concat(morphed),
+            };
+          },
+          {
+            lastSpring: startSpringPairing.spring,
+            lastVertex: startSpringPairing.vertex,
+            subsequent: [],
+          }
+        ).subsequent;
+
+        // need to remove out-gradients for all springs
+        // where the next spring is deleted
+
+        const morphedStart = morphOne(
+          startSpringPairing.spring,
+          startSpringPairing.vertex,
+          false
+        );
+        setStart(morphedStart);
+        setSubsequent(morphedSubsequent);
+      }
     });
 
     return () => s?.unsubscribe();
