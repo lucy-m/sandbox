@@ -236,5 +236,5 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     subsequent: subsequent.map((s) => toVertex(s, origin)),
   };
 
-  return <VertexBezier shape={shape} showMarkers={true} />;
+  return <VertexBezier shape={shape} showMarkers={false} />;
 };

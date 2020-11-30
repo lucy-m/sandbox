@@ -65,7 +65,7 @@ const F: VertexShape = {
 
 const I: VertexShape = {
   start: Sharp({ x: 0, y: 0 }),
-  subsequent: [Sharp({ x: 0, y: -100 })],
+  subsequent: [Sharp({ x: 0, y: -50 }), Sharp({ x: 0, y: -100 })],
 };
 
 export const letters = {
