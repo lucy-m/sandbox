@@ -14,5 +14,3 @@ export const SvgCircle: React.FC<SvgCircleProps> = (props) => {
 
   return <circle cx={x} cy={y} r={props.radius} fill={fill} />;
 };
-
-export default SvgCircle;

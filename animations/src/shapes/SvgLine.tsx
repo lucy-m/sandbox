@@ -16,5 +16,3 @@ export const SvgLine: React.FC<SvgLineProps> = (props) => {
     <line x1={start.x} y1={start.y} x2={end.x} y2={end.y} stroke={stroke} />
   );
 };
-
-export default SvgLine;

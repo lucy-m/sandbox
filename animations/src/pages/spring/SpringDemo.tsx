@@ -1,22 +1,23 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { Point, Zero } from '../shapes';
 import {
+  letters,
+  makeSpringBezierMaker,
+  SpringBezier,
+  SpringBezierShape,
+  SpringCircle,
+} from '.';
+import {
+  Point,
   Sharp,
   Smooth,
   SmoothAsymm,
   VertexShape,
-} from '../shapes/vertex-bezier';
-import { getMouseEventCoords } from '../util/getMouseEventCoOrds';
-import './Spring.css';
-import { letters } from './spring/letters';
-import {
-  makeSpringBezierMaker,
-  SpringBezier,
-  SpringBezierShape,
-} from './SpringBezier';
-import { SpringCircle } from './SpringCircle';
+  Zero,
+} from '../../shapes';
+import { getMouseEventCoords } from '../../util';
+import './SpringDemo.css';
 
 const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));

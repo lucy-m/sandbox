@@ -1,7 +1,7 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { Point, SvgCircle } from '../shapes';
-import { Spring, SpringFn } from '../shapes/spring';
+import { Point, SvgCircle } from '../../shapes';
+import { Spring, SpringFn } from '../../shapes/spring';
 
 const initialPosition = { x: 30, y: 40 };
 const initialVelocity = { x: 0, y: 0 };

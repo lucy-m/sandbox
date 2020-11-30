@@ -1,7 +1,7 @@
 import React from 'react';
 import { addPoint, Point } from './point';
-import SvgCircle from './svg-circle';
-import SvgLine from './svg-line';
+import { SvgCircle } from './SvgCircle';
+import { SvgLine } from './SvgLine';
 
 const markerSize = 1.5;
 const markerColours = {

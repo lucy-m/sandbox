@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { EmojiDemo } from './pages/emoji/EmojiDemo';
-import { SpringDemo } from './pages/SpringDemo';
+import { SpringDemo } from './pages/spring';
 import { Welcome } from './pages/Welcome';
 import { routes } from './routes';
 

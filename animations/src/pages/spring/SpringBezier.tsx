@@ -1,55 +1,14 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { addPoint, Point, Zero } from '../shapes';
-import { Spring, SpringFn, SpringProperties } from '../shapes/spring';
+import { Point, Zero } from '../../shapes';
+import { Spring, SpringFn } from '../../shapes/spring';
+import { Vertex, VertexBezier, VertexShape } from '../../shapes/vertex-bezier';
 import {
-  SmoothAsymm,
-  Vertex,
-  VertexBezier,
-  VertexShape,
-} from '../shapes/vertex-bezier';
-import { innerZip, spacedFullZip } from './spring/zip';
-
-export interface SpringBezierVertex {
-  position: Spring;
-  outGradient: Spring;
-  inGradient: Spring;
-  deleted: boolean;
-}
-
-export const makeSpringBezierMaker = (properties: SpringProperties) => (
-  vertex: Vertex
-): SpringBezierVertex => {
-  const r = () => Math.random() * 0.2 + 0.9;
-
-  const makeSpring = (p: Point): Spring => {
-    const permutedProperties: SpringProperties = {
-      stiffness: properties.stiffness * r(),
-      friction: properties.friction * r(),
-      weight: properties.weight * r(),
-    };
-    return SpringFn.makeSpring(p, Zero, p, permutedProperties);
-  };
-
-  return {
-    position: makeSpring(vertex.position),
-    inGradient: makeSpring(vertex.inGrad),
-    outGradient: makeSpring(vertex.outGrad),
-    deleted: false,
-  };
-};
-
-const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
-  SmoothAsymm(
-    addPoint(s.position.position, origin),
-    s.inGradient.position,
-    s.outGradient.position
-  );
-
-export interface SpringBezierShape {
-  start: SpringBezierVertex;
-  subsequent: SpringBezierVertex[];
-}
+  SpringBezierFn,
+  SpringBezierShape,
+  SpringBezierVertex,
+} from './spring-bezier-vertex';
+import { innerZip, spacedFullZip } from './zip';
 
 interface SpringBezierProps {
   initial: SpringBezierShape;
@@ -59,17 +18,6 @@ interface SpringBezierProps {
   nudge?: Observable<Point>;
   morph?: Observable<VertexShape>;
 }
-
-const apply = (
-  springs: SpringBezierVertex,
-  fn: (s: Spring) => Spring
-): SpringBezierVertex => {
-  const position = fn(springs.position);
-  const inGradient = springs.inGradient && fn(springs.inGradient);
-  const outGradient = springs.outGradient && fn(springs.outGradient);
-
-  return { position, inGradient, outGradient, deleted: springs.deleted };
-};
 
 export const SpringBezier: React.FC<SpringBezierProps> = (
   props: SpringBezierProps
@@ -89,8 +37,8 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
       if (started) {
         const fn = (s: Spring) => SpringFn.tick(s, dt);
 
-        setStart(apply(start, fn));
-        setSubsequent(subsequent.map((s) => apply(s, fn)));
+        setStart(SpringBezierFn.apply(start, fn));
+        setSubsequent(subsequent.map((s) => SpringBezierFn.apply(s, fn)));
       }
     });
     return () => s.unsubscribe();
@@ -232,8 +180,8 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   });
 
   const shape: VertexShape = {
-    start: toVertex(start, origin),
-    subsequent: subsequent.map((s) => toVertex(s, origin)),
+    start: SpringBezierFn.toVertex(start, origin),
+    subsequent: subsequent.map((s) => SpringBezierFn.toVertex(s, origin)),
   };
 
   return <VertexBezier shape={shape} showMarkers={false} />;
