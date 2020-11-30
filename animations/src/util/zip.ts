@@ -65,3 +65,23 @@ export const innerZip = <T, U>(ts: T[], us: U[]): [T, U][] => {
     return [t, u];
   });
 };
+
+/**
+ * Matches all of the left items up to the nearest right element
+ * using the given distance fn
+ * Items from second list may be duplicated
+ * @param ts
+ * @param us
+ */
+export const leftNearestZip = <T, U>(
+  ts: T[],
+  us: U[],
+  dist: (t: T, u: U) => number
+): [T, U][] => {
+  const match = (t: T): U =>
+    us
+      .map((u) => ({ u, dist: dist(t, u) }))
+      .reduce((a, b) => (a.dist < b.dist ? a : b)).u;
+
+  return ts.map((t) => [t, match(t)]);
+};

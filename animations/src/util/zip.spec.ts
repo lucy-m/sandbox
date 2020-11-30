@@ -1,4 +1,4 @@
-import { innerZip, spacedFullZip } from './zip';
+import { innerZip, leftNearestZip, spacedFullZip } from './zip';
 
 describe('spacedFullZip', () => {
   it('zips empty list correctly', () => {
@@ -106,5 +106,24 @@ describe('innerZip', () => {
     ];
 
     expect(innerZip(threeList, fiveList)).toEqual(expected);
+  });
+});
+
+describe('leftNearestZip', () => {
+  it('matches uneven length number list correctly', () => {
+    const a = [1, 2, 14, 29, 41];
+    const b = [0, 10, 20, 30];
+
+    const expected = [
+      [1, 0],
+      [2, 0],
+      [14, 10],
+      [29, 30],
+      [41, 30],
+    ];
+
+    const actual = leftNearestZip(a, b, (t, u) => Math.abs(t - u));
+
+    expect(actual).toEqual(expected);
   });
 });

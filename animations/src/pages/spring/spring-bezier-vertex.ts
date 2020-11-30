@@ -1,7 +1,7 @@
-import { addPoint, Point, Zero } from '../../shapes';
+import { addPoint, dist, Point, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
 import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/vertex-bezier';
-import { innerZip, spacedFullZip } from '../../util';
+import { innerZip, leftNearestZip, spacedFullZip } from '../../util';
 
 export interface SpringBezierVertex {
   position: Spring;
@@ -10,26 +10,46 @@ export interface SpringBezierVertex {
   deleted: boolean;
 }
 
-export const makeSpringBezierMaker = (properties: SpringProperties) => (
-  vertex: Vertex
-): SpringBezierVertex => {
-  const r = () => Math.random() * 0.2 + 0.9;
+export interface SpringBezierShape {
+  start: SpringBezierVertex;
+  subsequent: SpringBezierVertex[];
+}
 
-  const makeSpring = (p: Point): Spring => {
-    const permutedProperties: SpringProperties = {
-      stiffness: properties.stiffness * r(),
-      friction: properties.friction * r(),
-      weight: properties.weight * r(),
+export interface SpringBezierMaker {
+  vertex: (v: Vertex) => SpringBezierVertex;
+  shape: (s: VertexShape) => SpringBezierShape;
+}
+
+export const makeSpringBezierMaker = (
+  properties: SpringProperties,
+  randomPermute: boolean
+): SpringBezierMaker => {
+  const vertex = (v: Vertex): SpringBezierVertex => {
+    const r = () => (randomPermute ? Math.random() * 0.2 + 0.9 : 1);
+
+    const makeSpring = (p: Point): Spring => {
+      const permutedProperties: SpringProperties = {
+        stiffness: properties.stiffness * r(),
+        friction: properties.friction * r(),
+        weight: properties.weight * r(),
+      };
+      return SpringFn.makeSpring(p, Zero, p, permutedProperties);
     };
-    return SpringFn.makeSpring(p, Zero, p, permutedProperties);
+
+    return {
+      position: makeSpring(v.position),
+      inGradient: makeSpring(v.inGrad),
+      outGradient: makeSpring(v.outGrad),
+      deleted: false,
+    };
   };
 
-  return {
-    position: makeSpring(vertex.position),
-    inGradient: makeSpring(vertex.inGrad),
-    outGradient: makeSpring(vertex.outGrad),
-    deleted: false,
-  };
+  const shape = (s: VertexShape): SpringBezierShape => ({
+    start: vertex(s.start),
+    subsequent: s.subsequent.map(vertex),
+  });
+
+  return { vertex, shape };
 };
 
 const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
@@ -38,11 +58,6 @@ const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
     s.inGradient.position,
     s.outGradient.position
   );
-
-export interface SpringBezierShape {
-  start: SpringBezierVertex;
-  subsequent: SpringBezierVertex[];
-}
 
 const apply = (
   springs: SpringBezierVertex,
@@ -195,8 +210,56 @@ const spacedMorph = (
   return gradientCorrectedMorph(springShape, morphSprings);
 };
 
+const nearestMorph = (
+  springShape: SpringBezierShape,
+  vertexShape: VertexShape
+): SpringBezierShape => {
+  const morphSprings = (
+    springs: SpringBezierVertex[],
+    morphOne: MorphOneFn
+  ): SpringBezierVertex[] => {
+    const vertices = [vertexShape.start, ...vertexShape.subsequent];
+
+    // we want to ensure all existing springs go somewhere
+    // build a reverse map of spring to vertex
+    const reverseSpringToVertex = new Map(
+      leftNearestZip(springs, vertices, (s, v) =>
+        dist(s.position.position, v.position)
+      ).map(([a, b]) => [b, a])
+    );
+
+    // map of vertex to nearest spring as backup
+    const vertexToSpring = new Map(
+      leftNearestZip(vertices, springs, (v, s) =>
+        dist(v.position, s.position.position)
+      )
+    );
+
+    // for each vertex, if it is assigned to an existing spring
+    // then use that, else use its nearest vertex
+    const springVertexPairings = vertices.map((vertex) => {
+      const spring =
+        reverseSpringToVertex.get(vertex) ?? vertexToSpring.get(vertex)!;
+
+      return {
+        spring,
+        vertex,
+      };
+    });
+
+    const morphed = springVertexPairings.map(({ spring, vertex }) =>
+      morphOne(spring, vertex, false)
+    );
+
+    return morphed;
+  };
+
+  return gradientCorrectedMorph(springShape, morphSprings);
+};
+
 export const SpringBezierFn = {
   toVertex,
   apply,
   spacedMorph,
+  nearestMorph,
 };

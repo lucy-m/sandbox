@@ -1,13 +1,7 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import {
-  letters,
-  makeSpringBezierMaker,
-  SpringBezier,
-  SpringBezierShape,
-  SpringCircle,
-} from '.';
+import { letters, makeSpringBezierMaker, SpringBezier, SpringCircle } from '.';
 import {
   Point,
   Sharp,
@@ -22,20 +16,14 @@ import './SpringDemo.css';
 const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));
 
-const bezierMaker = makeSpringBezierMaker({
-  friction: 30,
-  stiffness: 3,
-  weight: 5,
-});
-
-const vertexShapeToSpringBezier = (
-  vertexShape: VertexShape
-): SpringBezierShape => {
-  const start = bezierMaker(vertexShape.start);
-  const subsequent = vertexShape.subsequent.map(bezierMaker);
-
-  return { start, subsequent };
-};
+const bezierMaker = makeSpringBezierMaker(
+  {
+    friction: 30,
+    stiffness: 3,
+    weight: 5,
+  },
+  true
+);
 
 export const SpringDemo: React.FC = () => {
   const [started, setStarted] = React.useState(true);
@@ -47,16 +35,18 @@ export const SpringDemo: React.FC = () => {
     circleEndPoint.next(getMouseEventCoords(e));
   };
 
-  const start = bezierMaker(Sharp({ x: 10, y: 60 }));
+  const start = bezierMaker.vertex(Sharp({ x: 10, y: 60 }));
   const subsequent = [
-    bezierMaker(Sharp({ x: 100, y: 24 })),
-    bezierMaker(Smooth({ x: 120, y: 80 }, { x: -20, y: -3 })),
-    bezierMaker(SmoothAsymm({ x: 180, y: 60 }, { x: -12, y: -12 }, Zero)),
-    bezierMaker(Smooth({ x: 170, y: 160 }, { x: -40, y: 0 })),
-    bezierMaker(SmoothAsymm({ x: 210, y: 55 }, Zero, { x: 20, y: -10 })),
-    bezierMaker(Sharp({ x: 300, y: 100 })),
-    bezierMaker(Sharp({ x: 300, y: 150 })),
-    bezierMaker(Smooth({ x: 270, y: 150 }, { x: 45, y: 100 })),
+    bezierMaker.vertex(Sharp({ x: 100, y: 24 })),
+    bezierMaker.vertex(Smooth({ x: 120, y: 80 }, { x: -20, y: -3 })),
+    bezierMaker.vertex(
+      SmoothAsymm({ x: 180, y: 60 }, { x: -12, y: -12 }, Zero)
+    ),
+    bezierMaker.vertex(Smooth({ x: 170, y: 160 }, { x: -40, y: 0 })),
+    bezierMaker.vertex(SmoothAsymm({ x: 210, y: 55 }, Zero, { x: 20, y: -10 })),
+    bezierMaker.vertex(Sharp({ x: 300, y: 100 })),
+    bezierMaker.vertex(Sharp({ x: 300, y: 150 })),
+    bezierMaker.vertex(Smooth({ x: 270, y: 150 }, { x: 45, y: 100 })),
   ];
 
   const nudgeUp = () => nudge.next({ x: 0, y: -100 });
@@ -88,7 +78,7 @@ export const SpringDemo: React.FC = () => {
           nudge={nudge}
         />
         <SpringBezier
-          initial={vertexShapeToSpringBezier(letters.A)}
+          initial={bezierMaker.shape(letters.A)}
           origin={{ x: 100, y: 300 }}
           timer={timer}
           started={started}
