@@ -2,13 +2,12 @@ import React from 'react';
 import { Observable } from 'rxjs';
 import { Point, Zero } from '../../shapes';
 import { Spring, SpringFn } from '../../shapes/spring';
-import { Vertex, VertexBezier, VertexShape } from '../../shapes/vertex-bezier';
+import { VertexBezier, VertexShape } from '../../shapes/vertex-bezier';
 import {
   SpringBezierFn,
   SpringBezierShape,
   SpringBezierVertex,
 } from './spring-bezier-vertex';
-import { innerZip, spacedFullZip } from './zip';
 
 interface SpringBezierProps {
   initial: SpringBezierShape;
@@ -69,111 +68,11 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
 
   React.useEffect(() => {
     const s = morph?.subscribe((shape: VertexShape) => {
-      const morphOne = (
-        spring: SpringBezierVertex,
-        vertex: Vertex,
-        deleted: boolean
-      ): SpringBezierVertex => {
-        const position = SpringFn.setEndPoint(spring.position, vertex.position);
-        const inGradient = SpringFn.setEndPoint(
-          spring.inGradient,
-          deleted ? Zero : vertex.inGrad
-        );
-        const outGradient = SpringFn.setEndPoint(
-          spring.outGradient,
-          vertex.outGrad
-        );
+      const springShape: SpringBezierShape = { start, subsequent };
+      const morphed = SpringBezierFn.spacedMorph(springShape, shape);
 
-        return { position, inGradient, outGradient, deleted };
-      };
-
-      // need to reset the outGradient for springs that are
-      // immediately before a deleted one
-      const springs = innerZip([start, ...subsequent], subsequent)
-        .map(([spring, next]) => {
-          if (next.deleted) {
-            const outGradient = SpringFn.setPositionAndEndpoint(
-              spring.outGradient,
-              next.outGradient.position
-            );
-            return { ...spring, outGradient };
-          } else {
-            return spring;
-          }
-        })
-        .concat(subsequent.slice(-1)[0])
-        .filter((s) => !s.deleted);
-      const zipped = spacedFullZip(springs, [shape.start, ...shape.subsequent]);
-
-      const startSpringPairing = (() => {
-        if (zipped[0] && zipped[0][0] && zipped[0][1]) {
-          return { spring: zipped[0][0], vertex: zipped[0][1] };
-        } else {
-          return undefined;
-        }
-      })();
-
-      if (startSpringPairing) {
-        interface Acc {
-          lastSpring: SpringBezierVertex;
-          lastVertex: Vertex;
-          subsequent: SpringBezierVertex[];
-        }
-
-        const morphedSubsequent = zipped.slice(1).reduce<Acc>(
-          (acc, next) => {
-            const spring = next[0] ?? acc.lastSpring;
-            const vertex = next[1] ?? acc.lastVertex;
-            const deleted = !next[1];
-
-            const morphed = morphOne(spring, vertex, deleted);
-
-            return {
-              lastSpring: spring,
-              lastVertex: vertex,
-              subsequent: acc.subsequent.concat(morphed),
-            };
-          },
-          {
-            lastSpring: startSpringPairing.spring,
-            lastVertex: startSpringPairing.vertex,
-            subsequent: [],
-          }
-        ).subsequent;
-
-        const morphedStart = morphOne(
-          startSpringPairing.spring,
-          startSpringPairing.vertex,
-          false
-        );
-
-        // need to remove out-gradients for all springs
-        // where the next spring is deleted
-        const correctGradient = (
-          spring: SpringBezierVertex,
-          next: SpringBezierVertex
-        ): SpringBezierVertex => {
-          if (next.deleted) {
-            const outGradient = SpringFn.setEndPoint(spring.outGradient, Zero);
-            return { ...spring, outGradient };
-          } else {
-            return spring;
-          }
-        };
-
-        const gradientCorrectedStart = morphedSubsequent[0]
-          ? correctGradient(morphedStart, morphedSubsequent[0])
-          : morphedStart;
-        const gradientCorrectedSubsequent = innerZip(
-          morphedSubsequent,
-          morphedSubsequent.slice(1)
-        )
-          .map(([spring, next]) => correctGradient(spring, next))
-          .concat(morphedSubsequent.slice(-1)[0]);
-
-        setStart(gradientCorrectedStart);
-        setSubsequent(gradientCorrectedSubsequent);
-      }
+      setStart(morphed.start);
+      setSubsequent(morphed.subsequent);
     });
 
     return () => s?.unsubscribe();
