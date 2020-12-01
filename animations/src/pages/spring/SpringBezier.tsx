@@ -58,7 +58,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
           s.outGradient &&
           SpringFn.setVelocity(s.outGradient, { x: r(), y: r() });
 
-        return { position, inGradient, outGradient, deleted: s.deleted };
+        return { ...s, position, inGradient, outGradient };
       };
       setStart(apply(start));
       setSubsequent(subsequent.map(apply));
@@ -83,5 +83,5 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     subsequent: subsequent.map((s) => SpringBezierFn.toVertex(s, origin)),
   };
 
-  return <VertexBezier shape={shape} showMarkers={false} />;
+  return <VertexBezier shape={shape} showMarkers={true} />;
 };

@@ -1,13 +1,14 @@
 import { addPoint, dist, Point, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
 import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/vertex-bezier';
-import { innerZip, leftNearestZip, spacedFullZip } from '../../util';
+import { leftNearestZip, spacedFullZip } from '../../util';
 
 export interface SpringBezierVertex {
   position: Spring;
   outGradient: Spring;
   inGradient: Spring;
-  deleted: boolean;
+  mergedTo: 'next' | 'previous' | 'none';
+  splitFrom: 'next' | 'previous' | 'none';
 }
 
 export interface SpringBezierShape {
@@ -40,7 +41,8 @@ export const makeSpringBezierMaker = (
       position: makeSpring(v.position),
       inGradient: makeSpring(v.inGrad),
       outGradient: makeSpring(v.outGrad),
-      deleted: false,
+      mergedTo: 'none',
+      splitFrom: 'none',
     };
   };
 
@@ -67,14 +69,46 @@ const apply = (
   const inGradient = springs.inGradient && fn(springs.inGradient);
   const outGradient = springs.outGradient && fn(springs.outGradient);
 
-  return { position, inGradient, outGradient, deleted: springs.deleted };
+  return { ...springs, position, inGradient, outGradient };
 };
 
 type MorphOneFn = (
   spring: SpringBezierVertex,
   vertex: Vertex,
-  deleted: boolean
+  mergeTo: 'next' | 'previous' | 'none',
+  splitFrom: 'next' | 'previous' | 'none'
 ) => SpringBezierVertex;
+
+export const morphOne = (
+  spring: SpringBezierVertex,
+  vertex: Vertex,
+  mergedTo: 'next' | 'previous' | 'none',
+  splitFrom: 'next' | 'previous' | 'none'
+): SpringBezierVertex => {
+  const position = SpringFn.setEndPoint(spring.position, vertex.position);
+
+  const inGradient = (() => {
+    const start = splitFrom === 'previous' ? Zero : spring.inGradient.position;
+    const endPoint = mergedTo === 'previous' ? Zero : vertex.inGrad;
+
+    return SpringFn.setEndPoint(
+      SpringFn.setPosition(spring.inGradient, start),
+      endPoint
+    );
+  })();
+
+  const outGradient = (() => {
+    const start = splitFrom === 'next' ? Zero : spring.outGradient.position;
+    const endPoint = mergedTo === 'next' ? Zero : vertex.outGrad;
+
+    return SpringFn.setEndPoint(
+      SpringFn.setPosition(spring.outGradient, start),
+      endPoint
+    );
+  })();
+
+  return { position, inGradient, outGradient, mergedTo, splitFrom };
+};
 
 const gradientCorrectedMorph = (
   springShape: SpringBezierShape,
@@ -85,60 +119,80 @@ const gradientCorrectedMorph = (
 ): SpringBezierShape => {
   const { start, subsequent } = springShape;
 
-  const morphOne: MorphOneFn = (
-    spring: SpringBezierVertex,
-    vertex: Vertex,
-    deleted: boolean
-  ): SpringBezierVertex => {
-    const position = SpringFn.setEndPoint(spring.position, vertex.position);
-    const inGradient = SpringFn.setEndPoint(
-      spring.inGradient,
-      deleted ? Zero : vertex.inGrad
-    );
-    const outGradient = SpringFn.setEndPoint(
-      spring.outGradient,
-      vertex.outGrad
-    );
+  // need to reset the outGradient and inGradient for springs that are
+  // connected to a spring that has been merged to them
+  const allSprings = [start, ...subsequent];
+  const springs = allSprings
+    .map((spring, i) => {
+      const prev = allSprings[i - 1];
+      const next = allSprings[i + 1];
 
-    return { position, inGradient, outGradient, deleted };
-  };
+      const inGradient =
+        prev && prev.mergedTo === 'next'
+          ? SpringFn.setPositionAndEndpoint(
+              spring.inGradient,
+              prev.inGradient.position
+            )
+          : spring.inGradient;
 
-  // need to reset the outGradient for springs that are
-  // immediately before a deleted one
-  const springs = innerZip([start, ...subsequent], subsequent)
-    .map(([spring, next]) => {
-      if (next.deleted) {
-        const outGradient = SpringFn.setPositionAndEndpoint(
-          spring.outGradient,
-          next.outGradient.position
-        );
-        return { ...spring, outGradient };
-      } else {
-        return spring;
-      }
+      const outGradient =
+        next && next.mergedTo === 'previous'
+          ? SpringFn.setPositionAndEndpoint(
+              spring.outGradient,
+              next.outGradient.position
+            )
+          : spring.outGradient;
+
+      return {
+        ...spring,
+        inGradient,
+        outGradient,
+      };
     })
-    .concat(subsequent.slice(-1)[0])
-    .filter((s) => !s.deleted);
+    .filter((s) => s.mergedTo === 'none');
 
   const morphed = morphSprings(springs, morphOne);
 
-  // need to remove out-gradients for all springs
-  // where the next spring is deleted
-  const correctGradient = (
-    spring: SpringBezierVertex,
-    next: SpringBezierVertex
-  ): SpringBezierVertex => {
-    if (next.deleted) {
-      const outGradient = SpringFn.setEndPoint(spring.outGradient, Zero);
-      return { ...spring, outGradient };
-    } else {
-      return spring;
-    }
-  };
+  // need to remove outGradient or inGradient for
+  // springs that have been merged
+  const gradientCorrected = morphed.map((spring, i) => {
+    const prev = morphed[i - 1];
+    const next = morphed[i + 1];
 
-  const gradientCorrected = innerZip(morphed, morphed.slice(1))
-    .map(([spring, next]) => correctGradient(spring, next))
-    .concat(morphed.slice(-1)[0]);
+    const outGradient = (() => {
+      const endPoint =
+        next && next.mergedTo === 'previous'
+          ? SpringFn.setEndPoint(spring.outGradient, Zero)
+          : spring.outGradient;
+
+      const position =
+        next && next.splitFrom === 'previous'
+          ? SpringFn.setPosition(endPoint, Zero)
+          : endPoint;
+
+      return position;
+    })();
+
+    const inGradient = (() => {
+      const endPoint =
+        prev && prev.mergedTo === 'next'
+          ? SpringFn.setEndPoint(spring.inGradient, Zero)
+          : spring.inGradient;
+
+      const position =
+        next && next.splitFrom === 'next'
+          ? SpringFn.setPosition(endPoint, Zero)
+          : endPoint;
+
+      return position;
+    })();
+
+    return {
+      ...spring,
+      inGradient,
+      outGradient,
+    };
+  });
 
   return {
     start: gradientCorrected[0] ?? start,
@@ -177,16 +231,18 @@ const spacedMorph = (
       const morphedStart = morphOne(
         startSpringPairing.spring,
         startSpringPairing.vertex,
-        false
+        'none',
+        'none'
       );
 
       const morphedSubsequent = zipped.slice(1).reduce<Acc>(
         (acc, next) => {
           const spring = next[0] ?? acc.lastSpring;
+          const splitFrom = next[0] ? 'none' : 'previous';
           const vertex = next[1] ?? acc.lastVertex;
-          const deleted = !next[1];
+          const morphTo = next[1] ? 'none' : 'previous';
 
-          const morphed = morphOne(spring, vertex, deleted);
+          const morphed = morphOne(spring, vertex, morphTo, splitFrom);
 
           return {
             lastSpring: spring,
@@ -248,7 +304,7 @@ const nearestMorph = (
     });
 
     const morphed = springVertexPairings.map(({ spring, vertex }) =>
-      morphOne(spring, vertex, false)
+      morphOne(spring, vertex, 'none', 'none')
     );
 
     return morphed;

@@ -4,15 +4,19 @@ import {
   p,
   Point,
   Sharp,
+  Smooth,
   SpringProperties,
+  Vertex,
   VertexShape,
   Zero,
 } from '../../shapes';
 import { unique } from '../../util';
 import {
+  morphOne,
   SpringBezierFn,
   SpringBezierMaker,
   SpringBezierShape,
+  SpringBezierVertex,
 } from './spring-bezier-vertex';
 
 describe('spring-bezier-vertex', () => {
@@ -49,6 +53,136 @@ describe('spring-bezier-vertex', () => {
       friction: 10,
     };
     bezierMaker = makeSpringBezierMaker(springProperties, false);
+  });
+
+  describe('morphOne', () => {
+    let spring: SpringBezierVertex;
+    let vertex: Vertex;
+
+    beforeEach(() => {
+      spring = bezierMaker.vertex(Smooth(p(1, 1), p(1, 0)));
+      vertex = Smooth(p(2, 1), p(2, 0));
+    });
+
+    interface TestCase {
+      mergeTo: 'next' | 'previous' | 'none';
+      splitFrom: 'next' | 'previous' | 'none';
+      outGradientEndPoint: 'target' | Point;
+      outGradientStart: 'original' | Point;
+      inGradientEndPoint: 'target' | Point;
+      inGradientStart: 'original' | Point;
+    }
+
+    const testCases: TestCase[] = [
+      {
+        mergeTo: 'none',
+        splitFrom: 'none',
+        outGradientEndPoint: 'target',
+        outGradientStart: 'original',
+        inGradientEndPoint: 'target',
+        inGradientStart: 'original',
+      },
+      {
+        mergeTo: 'next',
+        splitFrom: 'none',
+        outGradientEndPoint: Zero,
+        outGradientStart: 'original',
+        inGradientEndPoint: 'target',
+        inGradientStart: 'original',
+      },
+      {
+        mergeTo: 'previous',
+        splitFrom: 'none',
+        outGradientEndPoint: 'target',
+        outGradientStart: 'original',
+        inGradientEndPoint: Zero,
+        inGradientStart: 'original',
+      },
+      {
+        mergeTo: 'none',
+        splitFrom: 'next',
+        outGradientEndPoint: 'target',
+        outGradientStart: Zero,
+        inGradientEndPoint: 'target',
+        inGradientStart: 'original',
+      },
+      {
+        mergeTo: 'none',
+        splitFrom: 'previous',
+        outGradientEndPoint: 'target',
+        outGradientStart: 'original',
+        inGradientEndPoint: 'target',
+        inGradientStart: Zero,
+      },
+    ];
+
+    testCases.forEach((testCase) => {
+      describe(`for a point with mergeTo ${testCase.mergeTo} and
+      splitFrom ${testCase.splitFrom}`, () => {
+        let result: SpringBezierVertex;
+
+        beforeEach(() => {
+          result = morphOne(
+            spring,
+            vertex,
+            testCase.mergeTo,
+            testCase.splitFrom
+          );
+        });
+
+        it(
+          'sets the out gradient end point to ' + testCase.outGradientEndPoint,
+          () => {
+            const outGradient = result.outGradient.endPoint;
+            const expected =
+              testCase.outGradientEndPoint === 'target'
+                ? vertex.outGrad
+                : testCase.outGradientEndPoint;
+
+            expect(outGradient).toEqual(expected);
+          }
+        );
+
+        it(
+          'sets the out gradient start value to ' + testCase.outGradientStart,
+          () => {
+            const outGradient = result.outGradient.position;
+            const expected =
+              testCase.outGradientStart === 'original'
+                ? spring.outGradient.position
+                : testCase.outGradientStart;
+
+            expect(outGradient).toEqual(expected);
+          }
+        );
+
+        it(
+          'sets the in gradient end point to ' + testCase.inGradientEndPoint,
+          () => {
+            const inGradient = result.inGradient.endPoint;
+            const expected =
+              testCase.inGradientEndPoint === 'target'
+                ? vertex.inGrad
+                : testCase.inGradientEndPoint;
+
+            expect(inGradient).toEqual(expected);
+          }
+        );
+
+        it(
+          'sets the in gradient start value to ' + testCase.inGradientStart,
+          () => {
+            const inGradient = result.inGradient.position;
+            const expected =
+              testCase.inGradientStart === 'original'
+                ? spring.inGradient.position
+                : testCase.inGradientStart;
+
+            expect(inGradient).toEqual(expected);
+          }
+        );
+      });
+    });
   });
 
   describe('bezierMaker', () => {
