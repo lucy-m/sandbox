@@ -2,10 +2,15 @@ import React from 'react';
 import { Point } from './point';
 import { MoveAbs, SvgPathCommand } from './svg-path-commands';
 
+export interface DrawingConfig {
+  stroke?: string;
+  showMarkers?: boolean;
+}
+
 interface SvgPathProps {
   start: Point;
   commands: Array<SvgPathCommand>;
-  showMarkers?: boolean;
+  drawingConfig?: DrawingConfig;
 }
 
 export const SvgPath: React.FC<SvgPathProps> = (props) => {
@@ -14,8 +19,9 @@ export const SvgPath: React.FC<SvgPathProps> = (props) => {
     (str, command) => str + command.draw(),
     initial.draw()
   );
-  const path = <path d={d} stroke="black" fill="none" />;
-  if (!props.showMarkers) {
+  const stroke = props.drawingConfig?.stroke ?? 'black';
+  const path = <path d={d} stroke={stroke} fill="none" />;
+  if (!props.drawingConfig?.showMarkers) {
     return path;
   }
   const endSegmentMarkers = props.commands.reduce(

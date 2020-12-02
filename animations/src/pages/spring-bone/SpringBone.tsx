@@ -12,11 +12,5 @@ export const SpringBone: React.FC<SpringBoneProps> = (
 ) => {
   const vertexShape = toVertexShape(props.springBone);
 
-  return (
-    <VertexBezier
-      shape={vertexShape}
-      showMarkers={true}
-      origin={props.origin}
-    />
-  );
+  return <VertexBezier shape={vertexShape} origin={props.origin} />;
 };

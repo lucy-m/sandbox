@@ -1,7 +1,7 @@
 import React from 'react';
 import { addPoint, Point, scale, Zero } from './point';
-import { SvgPath } from './svg-path';
 import { CurveRel, SvgPathCommand } from './svg-path-commands';
+import { DrawingConfig, SvgPath } from './SvgPath';
 
 export interface Vertex {
   position: Point;
@@ -63,7 +63,7 @@ export const translateShape = (
 interface VertexBezierProps {
   shape: VertexShape;
   origin?: Point;
-  showMarkers?: boolean;
+  drawingConfig?: DrawingConfig;
 }
 
 export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
@@ -84,7 +84,7 @@ export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
     <SvgPath
       start={start}
       commands={commands}
-      showMarkers={props.showMarkers}
+      drawingConfig={props.drawingConfig}
     ></SvgPath>
   );
 };

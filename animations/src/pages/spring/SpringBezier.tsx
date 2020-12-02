@@ -1,6 +1,6 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { Point, Zero } from '../../shapes';
+import { DrawingConfig, Point, Zero } from '../../shapes';
 import { Spring, SpringFn } from '../../shapes/spring';
 import { VertexBezier, VertexShape } from '../../shapes/VertexBezier';
 import {
@@ -16,6 +16,7 @@ interface SpringBezierProps {
   started: boolean;
   nudge?: Observable<Point>;
   morph?: Observable<VertexShape>;
+  showSprings?: boolean;
 }
 
 export const SpringBezier: React.FC<SpringBezierProps> = (
@@ -69,7 +70,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   React.useEffect(() => {
     const s = morph?.subscribe((shape: VertexShape) => {
       const springShape: SpringBezierShape = { start, subsequent };
-      const morphed = SpringBezierFn.nearestMorph(springShape, shape);
+      const morphed = SpringBezierFn.spacedMorph(springShape, shape);
 
       setStart(morphed.start);
       setSubsequent(morphed.subsequent);
@@ -83,5 +84,34 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     subsequent: subsequent.map(SpringBezierFn.toVertex),
   };
 
-  return <VertexBezier shape={shape} showMarkers={true} origin={origin} />;
+  const springs = props.showSprings ? (
+    (() => {
+      const shapes = SpringBezierFn.getSpringDisplays({ start, subsequent });
+      const drawingConfig: DrawingConfig = {
+        stroke: 'hsl(0, 100%, 85%)',
+      };
+
+      return shapes.map((s, i) => (
+        <VertexBezier
+          key={i}
+          shape={s}
+          drawingConfig={drawingConfig}
+          origin={origin}
+        />
+      ));
+    })()
+  ) : (
+    <React.Fragment />
+  );
+
+  return (
+    <React.Fragment>
+      {springs}
+      <VertexBezier
+        shape={shape}
+        // drawingConfig={{ showMarkers: true }}
+        origin={origin}
+      />
+    </React.Fragment>
+  );
 };

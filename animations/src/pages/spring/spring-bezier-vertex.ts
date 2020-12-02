@@ -1,6 +1,11 @@
 import { dist, Point, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
-import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/VertexBezier';
+import {
+  Sharp,
+  SmoothAsymm,
+  Vertex,
+  VertexShape,
+} from '../../shapes/VertexBezier';
 import { leftNearestZip, spacedFullZip } from '../../util';
 
 type MergedTo = 'next' | 'previous' | 'none';
@@ -390,9 +395,18 @@ const nearestMorph = (
   return gradientCorrectedMorph(springShape, morphSprings);
 };
 
+const getSpringDisplays = (shape: SpringBezierShape): VertexShape[] => {
+  const springs = [shape.start, ...shape.subsequent].map((v) => v.position);
+  return springs.map((spring) => ({
+    start: Sharp(spring.position),
+    subsequent: [Sharp(spring.endPoint)],
+  }));
+};
+
 export const SpringBezierFn = {
   toVertex,
   apply,
   spacedMorph,
   nearestMorph,
+  getSpringDisplays,
 };

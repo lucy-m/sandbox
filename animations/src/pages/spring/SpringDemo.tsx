@@ -90,6 +90,7 @@ export const SpringDemo: React.FC = () => {
           timer={timer}
           started={started}
           morph={shapeMorph}
+          showSprings={true}
         />
       </svg>
       <div>
