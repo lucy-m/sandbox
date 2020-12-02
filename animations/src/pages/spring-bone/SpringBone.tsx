@@ -2,12 +2,14 @@ import React from 'react';
 import { Observable } from 'rxjs';
 import {
   addPoint,
+  getPoints,
   Point,
   SpringFn,
   SpringProperties,
   toVertexShape,
   VertexBezier,
 } from '../../shapes';
+import { SpringView } from '../spring/SpringView';
 import { BoneShape, tick, toSpringShape } from './spring-bone';
 
 interface SpringBoneProps {
@@ -15,6 +17,7 @@ interface SpringBoneProps {
   origin?: Point;
   timer: Observable<number>;
   nudge?: Observable<Point>;
+  showSprings?: boolean;
 }
 
 const springProperties: SpringProperties = {
@@ -52,5 +55,16 @@ export const SpringBone: React.FC<SpringBoneProps> = (
     return () => s?.unsubscribe();
   });
 
-  return <VertexBezier shape={toVertexShape(shape)} origin={props.origin} />;
+  const springDisplay = props.showSprings ? (
+    <SpringView springs={getPoints(shape)} origin={props.origin} />
+  ) : (
+    <React.Fragment />
+  );
+
+  return (
+    <React.Fragment>
+      {springDisplay}
+      <VertexBezier shape={toVertexShape(shape)} origin={props.origin} />
+    </React.Fragment>
+  );
 };

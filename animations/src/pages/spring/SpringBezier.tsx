@@ -1,6 +1,6 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { DrawingConfig, Point, Zero } from '../../shapes';
+import { getPoints, Point, Zero } from '../../shapes';
 import { Spring, SpringFn } from '../../shapes/spring';
 import { VertexBezier, VertexShape } from '../../shapes/VertexBezier';
 import {
@@ -8,6 +8,7 @@ import {
   SpringBezierShape,
   SpringBezierVertex,
 } from './spring-bezier-vertex';
+import { SpringView } from './SpringView';
 
 interface SpringBezierProps {
   initial: SpringBezierShape;
@@ -86,19 +87,8 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
 
   const springs = props.showSprings ? (
     (() => {
-      const shapes = SpringBezierFn.getSpringDisplays({ start, subsequent });
-      const drawingConfig: DrawingConfig = {
-        stroke: 'hsl(0, 100%, 85%)',
-      };
-
-      return shapes.map((s, i) => (
-        <VertexBezier
-          key={i}
-          shape={s}
-          drawingConfig={drawingConfig}
-          origin={origin}
-        />
-      ));
+      const springs = getPoints({ start, subsequent }).map((v) => v.position);
+      return <SpringView springs={springs} origin={origin} />;
     })()
   ) : (
     <React.Fragment />

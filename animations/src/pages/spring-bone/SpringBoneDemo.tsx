@@ -27,6 +27,7 @@ export const SpringBoneDemo: React.FC = () => {
           origin={p(20, 120)}
           nudge={nudge}
           timer={timer}
+          showSprings={true}
         />
       </svg>
       <div>
