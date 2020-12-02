@@ -2,8 +2,8 @@ import React from 'react';
 import { Observable } from 'rxjs';
 import {
   addPoint,
-  getPoints,
   Point,
+  ShapeFn,
   SpringFn,
   SpringProperties,
   toVertexShape,
@@ -56,7 +56,7 @@ export const SpringBone: React.FC<SpringBoneProps> = (
   });
 
   const springDisplay = props.showSprings ? (
-    <SpringView springs={getPoints(shape)} origin={props.origin} />
+    <SpringView springs={ShapeFn.getPoints(shape)} origin={props.origin} />
   ) : (
     <React.Fragment />
   );

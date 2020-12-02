@@ -1,4 +1,4 @@
-import { dist, Point, Zero } from '../../shapes';
+import { dist, Point, Shape, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
 import {
   Sharp,
@@ -19,10 +19,7 @@ export interface SpringBezierVertex {
   splitFrom: SplitFrom;
 }
 
-export interface SpringBezierShape {
-  start: SpringBezierVertex;
-  subsequent: SpringBezierVertex[];
-}
+export type SpringBezierShape = Shape<SpringBezierVertex>;
 
 export interface SpringBezierMaker {
   vertex: (v: Vertex) => SpringBezierVertex;

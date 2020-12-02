@@ -1,6 +1,6 @@
 import React from 'react';
 import { Observable } from 'rxjs';
-import { getPoints, Point, Zero } from '../../shapes';
+import { Point, ShapeFn, Zero } from '../../shapes';
 import { Spring, SpringFn } from '../../shapes/spring';
 import { VertexBezier, VertexShape } from '../../shapes/VertexBezier';
 import {
@@ -26,20 +26,15 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   const { timer, started, nudge, morph } = props;
   const origin = props.origin ?? Zero;
 
-  const [start, setStart] = React.useState<SpringBezierVertex>(
-    props.initial.start
-  );
-  const [subsequent, setSubsequent] = React.useState<SpringBezierVertex[]>(
-    props.initial.subsequent
-  );
+  const [shape, setShape] = React.useState<SpringBezierShape>(props.initial);
 
   React.useEffect(() => {
     const s = timer.subscribe((dt: number) => {
       if (started) {
         const fn = (s: Spring) => SpringFn.tick(s, dt);
 
-        setStart(SpringBezierFn.apply(start, fn));
-        setSubsequent(subsequent.map((s) => SpringBezierFn.apply(s, fn)));
+        const updated = ShapeFn.map(shape, (s) => SpringBezierFn.apply(s, fn));
+        setShape(updated);
       }
     });
     return () => s.unsubscribe();
@@ -48,46 +43,42 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   React.useEffect(() => {
     const s = nudge?.subscribe((n: Point) => {
       const r = () => Math.random() * 3 - 1.5;
-      const apply = (s: SpringBezierVertex): SpringBezierVertex => {
-        const position = SpringFn.setVelocity(
-          SpringFn.nudgeEndPoint(s.position, n),
-          { x: r(), y: r() }
-        );
-        const inGradient =
-          s.inGradient &&
-          SpringFn.setVelocity(s.inGradient, { x: r(), y: r() });
-        const outGradient =
-          s.outGradient &&
-          SpringFn.setVelocity(s.outGradient, { x: r(), y: r() });
+      const updated = ShapeFn.map(
+        shape,
+        (s: SpringBezierVertex): SpringBezierVertex => {
+          const position = SpringFn.setVelocity(
+            SpringFn.nudgeEndPoint(s.position, n),
+            { x: r(), y: r() }
+          );
+          const inGradient =
+            s.inGradient &&
+            SpringFn.setVelocity(s.inGradient, { x: r(), y: r() });
+          const outGradient =
+            s.outGradient &&
+            SpringFn.setVelocity(s.outGradient, { x: r(), y: r() });
 
-        return { ...s, position, inGradient, outGradient };
-      };
-      setStart(apply(start));
-      setSubsequent(subsequent.map(apply));
+          return { ...s, position, inGradient, outGradient };
+        }
+      );
+      setShape(updated);
     });
     return () => s?.unsubscribe();
   });
 
   React.useEffect(() => {
-    const s = morph?.subscribe((shape: VertexShape) => {
-      const springShape: SpringBezierShape = { start, subsequent };
-      const morphed = SpringBezierFn.spacedMorph(springShape, shape);
-
-      setStart(morphed.start);
-      setSubsequent(morphed.subsequent);
+    const s = morph?.subscribe((vertexShape: VertexShape) => {
+      const morphed = SpringBezierFn.spacedMorph(shape, vertexShape);
+      setShape(morphed);
     });
 
     return () => s?.unsubscribe();
   });
 
-  const shape: VertexShape = {
-    start: SpringBezierFn.toVertex(start),
-    subsequent: subsequent.map(SpringBezierFn.toVertex),
-  };
+  const vertexShape: VertexShape = ShapeFn.map(shape, SpringBezierFn.toVertex);
 
   const springs = props.showSprings ? (
     (() => {
-      const springs = getPoints({ start, subsequent }).map((v) => v.position);
+      const springs = ShapeFn.getPoints(shape).map((v) => v.position);
       return <SpringView springs={springs} origin={origin} />;
     })()
   ) : (
@@ -98,7 +89,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
     <React.Fragment>
       {springs}
       <VertexBezier
-        shape={shape}
+        shape={vertexShape}
         // drawingConfig={{ showMarkers: true }}
         origin={origin}
       />

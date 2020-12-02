@@ -1,9 +1,9 @@
 import {
   addPoint,
-  getPoints,
   Point,
   scale,
   Shape,
+  ShapeFn,
   SpringFn,
   SpringProperties,
   SpringShape,
@@ -30,8 +30,8 @@ export const tick = (
   dt: number
 ): SpringShape => {
   // adjust endpoints to remain a constant offset between points
-  const points = getPoints(base);
-  const allSprings = getPoints(springShape);
+  const points = ShapeFn.getPoints(base);
+  const allSprings = ShapeFn.getPoints(springShape);
 
   const adjusted = allSprings.map((spring, i) => {
     const prevSpring = allSprings[i - 1];
