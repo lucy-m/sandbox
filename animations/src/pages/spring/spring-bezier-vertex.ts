@@ -293,8 +293,6 @@ const nearestMorph = (
         })
         .filter(({ deleted }) => deleted);
 
-      console.log('deleted', deletedSprings);
-
       interface MergeToVertexResult {
         vertex: Vertex;
         mergedTo: MergedTo;
@@ -348,8 +346,6 @@ const nearestMorph = (
         mergeToVertex: MergeToVertexResult;
       }[];
     })();
-
-    console.log('additional springs', additionalSprings);
 
     const allSprings = vertexToSpring
       .map((entry) => {
