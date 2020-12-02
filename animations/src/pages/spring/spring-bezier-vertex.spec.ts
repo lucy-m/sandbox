@@ -196,14 +196,14 @@ describe('spring-bezier-vertex', () => {
       it('creates springs correctly', () => {
         const expected: SpringBezierShape = {
           start: {
-            deleted: false,
             inGradient: zeroSpring(),
             outGradient: zeroSpring(),
             position: zeroSpring(),
+            mergedTo: 'none',
+            splitFrom: 'none',
           },
           subsequent: [
             {
-              deleted: false,
               inGradient: zeroSpring(),
               outGradient: zeroSpring(),
               position: {
@@ -212,9 +212,10 @@ describe('spring-bezier-vertex', () => {
                 velocity: Zero,
                 properties: springProperties,
               },
+              mergedTo: 'none',
+              splitFrom: 'none',
             },
             {
-              deleted: false,
               inGradient: zeroSpring(),
               outGradient: zeroSpring(),
               position: {
@@ -223,9 +224,10 @@ describe('spring-bezier-vertex', () => {
                 velocity: Zero,
                 properties: springProperties,
               },
+              mergedTo: 'none',
+              splitFrom: 'none',
             },
             {
-              deleted: false,
               inGradient: zeroSpring(),
               outGradient: zeroSpring(),
               position: {
@@ -234,6 +236,8 @@ describe('spring-bezier-vertex', () => {
                 velocity: Zero,
                 properties: springProperties,
               },
+              mergedTo: 'none',
+              splitFrom: 'none',
             },
           ],
         };
@@ -243,182 +247,200 @@ describe('spring-bezier-vertex', () => {
     });
   });
 
-  describe('spacedMorph', () => {
-    describe('for a square', () => {
-      let initialSquare: VertexShape;
-      let initialSpringShape: SpringBezierShape;
+  describe('morphFns', () => {
+    interface TestCase {
+      name: string;
+      morphFn: (
+        springShape: SpringBezierShape,
+        vertexShape: VertexShape
+      ) => SpringBezierShape;
+    }
 
-      beforeEach(() => {
-        initialSquare = makeSquare(Zero);
-        initialSpringShape = bezierMaker.shape(initialSquare);
-      });
+    const testCases: TestCase[] = [
+      {
+        name: 'spacedMorph',
+        morphFn: SpringBezierFn.spacedMorph,
+      },
+      {
+        name: 'nearestMorph',
+        morphFn: SpringBezierFn.nearestMorph,
+      },
+    ];
 
-      describe('morphing to the same shape', () => {
-        let newSpringShape: SpringBezierShape;
+    testCases.forEach((testCase) => {
+      describe(`${testCase.name}`, () => {
+        describe('for a square', () => {
+          let initialSquare: VertexShape;
+          let initialSpringShape: SpringBezierShape;
 
-        beforeEach(() => {
-          newSpringShape = SpringBezierFn.spacedMorph(
-            initialSpringShape,
-            initialSquare
-          );
-        });
+          beforeEach(() => {
+            initialSquare = makeSquare(Zero);
+            initialSpringShape = bezierMaker.shape(initialSquare);
+          });
 
-        it('does nothing', () => {
-          expect(newSpringShape).toEqual(initialSpringShape);
-        });
-      });
+          describe('morphing to the same shape', () => {
+            let newSpringShape: SpringBezierShape;
 
-      describe('morphing to a translated square', () => {
-        let newSquare: VertexShape;
-        let newSpringShape: SpringBezierShape;
+            beforeEach(() => {
+              newSpringShape = testCase.morphFn(
+                initialSpringShape,
+                initialSquare
+              );
+            });
 
-        beforeEach(() => {
-          newSquare = makeSquare(p(1, 0));
-          newSpringShape = SpringBezierFn.spacedMorph(
-            initialSpringShape,
-            newSquare
-          );
-        });
+            it('does nothing', () => {
+              expect(newSpringShape).toEqual(initialSpringShape);
+            });
+          });
 
-        it('updates springs correctly', () => {
-          const expected: SpringBezierShape = {
-            start: {
-              deleted: false,
-              inGradient: zeroSpring(),
-              outGradient: zeroSpring(),
-              position: {
-                position: p(0, 0),
-                endPoint: p(1, 0),
-                velocity: Zero,
-                properties: springProperties,
-              },
-            },
-            subsequent: [
-              {
-                deleted: false,
-                inGradient: zeroSpring(),
-                outGradient: zeroSpring(),
-                position: {
-                  position: p(1, 0),
-                  endPoint: p(2, 0),
-                  velocity: Zero,
-                  properties: springProperties,
+          describe('morphing to a translated square', () => {
+            let newSquare: VertexShape;
+            let newSpringShape: SpringBezierShape;
+
+            beforeEach(() => {
+              newSquare = makeSquare(p(1, 0));
+              newSpringShape = testCase.morphFn(initialSpringShape, newSquare);
+            });
+
+            it('updates springs correctly', () => {
+              const expected: SpringBezierShape = {
+                start: {
+                  inGradient: zeroSpring(),
+                  outGradient: zeroSpring(),
+                  position: {
+                    position: p(0, 0),
+                    endPoint: p(1, 0),
+                    velocity: Zero,
+                    properties: springProperties,
+                  },
+                  mergedTo: 'none',
+                  splitFrom: 'none',
                 },
-              },
-              {
-                deleted: false,
-                inGradient: zeroSpring(),
-                outGradient: zeroSpring(),
-                position: {
-                  position: p(1, 1),
-                  endPoint: p(2, 1),
-                  velocity: Zero,
-                  properties: springProperties,
-                },
-              },
-              {
-                deleted: false,
-                inGradient: zeroSpring(),
-                outGradient: zeroSpring(),
-                position: {
-                  position: p(0, 1),
-                  endPoint: p(1, 1),
-                  velocity: Zero,
-                  properties: springProperties,
-                },
-              },
-            ],
-          };
+                subsequent: [
+                  {
+                    inGradient: zeroSpring(),
+                    outGradient: zeroSpring(),
+                    position: {
+                      position: p(1, 0),
+                      endPoint: p(2, 0),
+                      velocity: Zero,
+                      properties: springProperties,
+                    },
+                    mergedTo: 'none',
+                    splitFrom: 'none',
+                  },
+                  {
+                    inGradient: zeroSpring(),
+                    outGradient: zeroSpring(),
+                    position: {
+                      position: p(1, 1),
+                      endPoint: p(2, 1),
+                      velocity: Zero,
+                      properties: springProperties,
+                    },
+                    mergedTo: 'none',
+                    splitFrom: 'none',
+                  },
+                  {
+                    inGradient: zeroSpring(),
+                    outGradient: zeroSpring(),
+                    position: {
+                      position: p(0, 1),
+                      endPoint: p(1, 1),
+                      velocity: Zero,
+                      properties: springProperties,
+                    },
+                    mergedTo: 'none',
+                    splitFrom: 'none',
+                  },
+                ],
+              };
 
-          expect(newSpringShape).toEqual(expected);
-        });
-      });
+              expect(newSpringShape).toEqual(expected);
+            });
+          });
 
-      describe('morphing to a triangle', () => {
-        let triangle: VertexShape;
-        let newSpringShape: SpringBezierShape;
+          describe('morphing to a triangle', () => {
+            let triangle: VertexShape;
+            let newSpringShape: SpringBezierShape;
 
-        beforeEach(() => {
-          triangle = makeTriangle(Zero);
-          newSpringShape = SpringBezierFn.spacedMorph(
-            initialSpringShape,
-            triangle
-          );
-        });
+            beforeEach(() => {
+              triangle = makeTriangle(Zero);
+              newSpringShape = testCase.morphFn(initialSpringShape, triangle);
+            });
 
-        it('collapses two vertices together', () => {
-          const posEndPoints = [
-            newSpringShape.start,
-            ...newSpringShape.subsequent,
-          ].map((s) => s.position.endPoint);
+            it('collapses two vertices together', () => {
+              const posEndPoints = [
+                newSpringShape.start,
+                ...newSpringShape.subsequent,
+              ].map((s) => s.position.endPoint);
 
-          const uniqueEndPoints = unique(posEndPoints);
-          expect(uniqueEndPoints.length).toBe(3);
-        });
+              const uniqueEndPoints = unique(posEndPoints);
+              expect(uniqueEndPoints.length).toBe(3);
+            });
 
-        it('end points are all on triangle', () => {
-          const posEndPoints = [
-            newSpringShape.start,
-            ...newSpringShape.subsequent,
-          ].map((s) => s.position.endPoint);
+            it('end points are all on triangle', () => {
+              const posEndPoints = [
+                newSpringShape.start,
+                ...newSpringShape.subsequent,
+              ].map((s) => s.position.endPoint);
 
-          const uniqueEndPoints = unique(posEndPoints);
+              const uniqueEndPoints = unique(posEndPoints);
 
-          const expected = [Zero, p(1, 0), p(0, 1)];
+              const expected = [Zero, p(1, 0), p(0, 1)];
 
-          expect(uniqueEndPoints).toEqual(expected);
-        });
-      });
-    });
-
-    describe('for a triangle', () => {
-      let initialTriangle: VertexShape;
-      let initialSpringShape: SpringBezierShape;
-
-      beforeEach(() => {
-        initialTriangle = makeTriangle(Zero);
-        initialSpringShape = bezierMaker.shape(initialTriangle);
-      });
-
-      describe('morphing to a square', () => {
-        let square: VertexShape;
-        let newSpringShape: SpringBezierShape;
-
-        beforeEach(() => {
-          square = makeSquare(Zero);
-          newSpringShape = SpringBezierFn.spacedMorph(
-            initialSpringShape,
-            square
-          );
+              expect(uniqueEndPoints).toEqual(expected);
+            });
+          });
         });
 
-        it('creates an extra vertex', () => {
-          const vertexCount = newSpringShape.subsequent.length + 1;
-          expect(vertexCount).toBe(4);
-        });
+        describe('for a triangle', () => {
+          let initialTriangle: VertexShape;
+          let initialSpringShape: SpringBezierShape;
 
-        it('start points are all on triangle', () => {
-          const startPoints = [
-            newSpringShape.start,
-            ...newSpringShape.subsequent,
-          ].map((s) => s.position.position);
+          beforeEach(() => {
+            initialTriangle = makeTriangle(Zero);
+            initialSpringShape = bezierMaker.shape(initialTriangle);
+          });
 
-          const uniqueStartPoints = unique(startPoints);
+          describe('morphing to a square', () => {
+            let square: VertexShape;
+            let newSpringShape: SpringBezierShape;
 
-          const expected = [Zero, p(1, 0), p(0, 1)];
+            beforeEach(() => {
+              square = makeSquare(Zero);
+              newSpringShape = testCase.morphFn(initialSpringShape, square);
+            });
 
-          expect(uniqueStartPoints).toEqual(expected);
-        });
+            it('creates an extra vertex', () => {
+              const vertexCount = newSpringShape.subsequent.length + 1;
+              expect(vertexCount).toBe(4);
+            });
 
-        it('end points are all on square', () => {
-          const endPoints = [
-            newSpringShape.start,
-            ...newSpringShape.subsequent,
-          ].map((s) => s.position.endPoint);
+            it('start points are all on triangle', () => {
+              const startPoints = [
+                newSpringShape.start,
+                ...newSpringShape.subsequent,
+              ].map((s) => s.position.position);
 
-          const expected = [Zero, p(1, 0), p(1, 1), p(0, 1)];
+              const uniqueStartPoints = unique(startPoints);
 
-          expect(endPoints).toEqual(expected);
+              const expected = [Zero, p(1, 0), p(0, 1)];
+
+              expect(uniqueStartPoints).toEqual(expected);
+            });
+
+            it('end points are all on square', () => {
+              const endPoints = [
+                newSpringShape.start,
+                ...newSpringShape.subsequent,
+              ].map((s) => s.position.endPoint);
+
+              const expected = [Zero, p(1, 0), p(1, 1), p(0, 1)];
+
+              expect(endPoints).toEqual(expected);
+            });
+          });
         });
       });
     });

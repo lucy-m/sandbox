@@ -3,12 +3,15 @@ import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
 import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/vertex-bezier';
 import { leftNearestZip, spacedFullZip } from '../../util';
 
+type MergedTo = 'next' | 'previous' | 'none';
+type SplitFrom = 'next' | 'previous' | 'none';
+
 export interface SpringBezierVertex {
   position: Spring;
   outGradient: Spring;
   inGradient: Spring;
-  mergedTo: 'next' | 'previous' | 'none';
-  splitFrom: 'next' | 'previous' | 'none';
+  mergedTo: MergedTo;
+  splitFrom: SplitFrom;
 }
 
 export interface SpringBezierShape {
@@ -75,15 +78,15 @@ const apply = (
 type MorphOneFn = (
   spring: SpringBezierVertex,
   vertex: Vertex,
-  mergeTo: 'next' | 'previous' | 'none',
-  splitFrom: 'next' | 'previous' | 'none'
+  mergeTo: MergedTo,
+  splitFrom: SplitFrom
 ) => SpringBezierVertex;
 
 export const morphOne = (
   spring: SpringBezierVertex,
   vertex: Vertex,
-  mergedTo: 'next' | 'previous' | 'none',
-  splitFrom: 'next' | 'previous' | 'none'
+  mergedTo: MergedTo,
+  splitFrom: SplitFrom
 ): SpringBezierVertex => {
   const position = SpringFn.setEndPoint(spring.position, vertex.position);
 
@@ -276,35 +279,113 @@ const nearestMorph = (
   ): SpringBezierVertex[] => {
     const vertices = [vertexShape.start, ...vertexShape.subsequent];
 
-    // we want to ensure all existing springs go somewhere
-    // build a reverse map of spring to vertex
-    const reverseSpringToVertex = new Map(
-      leftNearestZip(springs, vertices, (s, v) =>
-        dist(s.position.position, v.position)
-      ).map(([a, b]) => [b, a])
+    const vertexToSpring = leftNearestZip(vertices, springs, (v, s) =>
+      dist(v.position, s.position.position)
     );
 
-    // map of vertex to nearest spring as backup
-    const vertexToSpring = new Map(
-      leftNearestZip(vertices, springs, (v, s) =>
-        dist(v.position, s.position.position)
-      )
-    );
+    const additionalSprings = (() => {
+      const deletedSprings = springs
+        .map((spring, i) => {
+          const vertex = vertexToSpring.find(([_, s]) => s === spring);
+          const deleted = !vertex;
 
-    // for each vertex, if it is assigned to an existing spring
-    // then use that, else use its nearest vertex
-    const springVertexPairings = vertices.map((vertex) => {
-      const spring =
-        reverseSpringToVertex.get(vertex) ?? vertexToSpring.get(vertex)!;
+          return { spring, i, deleted };
+        })
+        .filter(({ deleted }) => deleted);
 
-      return {
-        spring,
-        vertex,
+      console.log('deleted', deletedSprings);
+
+      interface MergeToVertexResult {
+        vertex: Vertex;
+        mergedTo: MergedTo;
+      }
+      const getMergeToVertex = (
+        index: number
+      ): MergeToVertexResult | undefined => {
+        const getMorphSpringInner = (
+          step: number
+        ): MergeToVertexResult | undefined => {
+          if (step > springs.length) {
+            return undefined;
+          }
+          const lower = springs[index - step];
+          const upper = springs[index + step];
+
+          if (lower) {
+            const vertex = vertexToSpring.find(([_, s]) => s === lower);
+            if (vertex) {
+              return {
+                vertex: vertex[0],
+                mergedTo: 'previous',
+              };
+            }
+          }
+          if (upper) {
+            const vertex = vertexToSpring.find(([_, s]) => s === upper);
+            if (vertex) {
+              return {
+                vertex: vertex[0],
+                mergedTo: 'next',
+              };
+            }
+          }
+
+          return getMorphSpringInner(step + 1);
+        };
+
+        return getMorphSpringInner(1);
       };
-    });
 
-    const morphed = springVertexPairings.map(({ spring, vertex }) =>
-      morphOne(spring, vertex, 'none', 'none')
+      const additionalSprings = deletedSprings
+        .map(({ spring, i }) => {
+          const result = getMergeToVertex(i);
+          return { spring, mergeToVertex: result };
+        })
+        .filter(({ mergeToVertex }) => !!mergeToVertex);
+
+      return additionalSprings as {
+        spring: SpringBezierVertex;
+        mergeToVertex: MergeToVertexResult;
+      }[];
+    })();
+
+    console.log('additional springs', additionalSprings);
+
+    const allSprings = vertexToSpring
+      .map((entry) => {
+        const makeEntry = (
+          spring: SpringBezierVertex,
+          vertex: Vertex,
+          mergedTo: MergedTo,
+          splitFrom: SplitFrom
+        ) => ({
+          spring,
+          vertex,
+          mergedTo,
+          splitFrom,
+        });
+
+        const [v, spring] = entry;
+        const mySprings = additionalSprings.filter(
+          ({ mergeToVertex }) => mergeToVertex.vertex === v
+        );
+        const priorSprings = mySprings
+          .filter(({ mergeToVertex }) => mergeToVertex.mergedTo === 'next')
+          .map(({ spring }) => makeEntry(spring, v, 'next', 'none'));
+        const afterSprings = mySprings
+          .filter(({ mergeToVertex }) => mergeToVertex.mergedTo === 'previous')
+          .map(({ spring }) => makeEntry(spring, v, 'previous', 'none'));
+
+        return [
+          ...priorSprings,
+          makeEntry(spring, v, 'none', 'none'),
+          ...afterSprings,
+        ];
+      })
+      .reduce((a, b) => a.concat(b), []);
+
+    const morphed = allSprings.map(({ spring, vertex, mergedTo, splitFrom }) =>
+      morphOne(spring, vertex, mergedTo, splitFrom)
     );
 
     return morphed;

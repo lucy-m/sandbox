@@ -69,7 +69,7 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   React.useEffect(() => {
     const s = morph?.subscribe((shape: VertexShape) => {
       const springShape: SpringBezierShape = { start, subsequent };
-      const morphed = SpringBezierFn.spacedMorph(springShape, shape);
+      const morphed = SpringBezierFn.nearestMorph(springShape, shape);
 
       setStart(morphed.start);
       setSubsequent(morphed.subsequent);

@@ -3,6 +3,7 @@ import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 import { letters, makeSpringBezierMaker, SpringBezier, SpringCircle } from '.';
 import {
+  p,
   Point,
   Sharp,
   Smooth,
@@ -10,6 +11,7 @@ import {
   VertexShape,
   Zero,
 } from '../../shapes';
+import { makeSquare } from '../../shapes/square';
 import { getMouseEventCoords } from '../../util';
 import './SpringDemo.css';
 
@@ -24,6 +26,9 @@ const bezierMaker = makeSpringBezierMaker(
   },
   true
 );
+
+const square1 = makeSquare(Zero, 50);
+const square2 = makeSquare(p(50, 0), 50);
 
 export const SpringDemo: React.FC = () => {
   const [started, setStarted] = React.useState(true);
@@ -61,6 +66,8 @@ export const SpringDemo: React.FC = () => {
   const morphE = () => shapeMorph.next(letters.E);
   const morphF = () => shapeMorph.next(letters.F);
   const morphI = () => shapeMorph.next(letters.I);
+  const morphSquare1 = () => shapeMorph.next(square1);
+  const morphSquare2 = () => shapeMorph.next(square2);
 
   return (
     <div>
@@ -99,6 +106,10 @@ export const SpringDemo: React.FC = () => {
         <button onClick={morphE}>Morph E</button>
         <button onClick={morphF}>Morph F</button>
         <button onClick={morphI}>Morph I</button>
+      </div>
+      <div>
+        <button onClick={morphSquare1}>Square 1</button>
+        <button onClick={morphSquare2}>Square 2</button>
       </div>
     </div>
   );
