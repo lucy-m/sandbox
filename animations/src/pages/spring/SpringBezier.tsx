@@ -2,7 +2,7 @@ import React from 'react';
 import { Observable } from 'rxjs';
 import { Point, Zero } from '../../shapes';
 import { Spring, SpringFn } from '../../shapes/spring';
-import { VertexBezier, VertexShape } from '../../shapes/vertex-bezier';
+import { VertexBezier, VertexShape } from '../../shapes/VertexBezier';
 import {
   SpringBezierFn,
   SpringBezierShape,
@@ -79,9 +79,9 @@ export const SpringBezier: React.FC<SpringBezierProps> = (
   });
 
   const shape: VertexShape = {
-    start: SpringBezierFn.toVertex(start, origin),
-    subsequent: subsequent.map((s) => SpringBezierFn.toVertex(s, origin)),
+    start: SpringBezierFn.toVertex(start),
+    subsequent: subsequent.map(SpringBezierFn.toVertex),
   };
 
-  return <VertexBezier shape={shape} showMarkers={true} />;
+  return <VertexBezier shape={shape} showMarkers={true} origin={origin} />;
 };

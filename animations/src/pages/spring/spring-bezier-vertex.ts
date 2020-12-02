@@ -1,6 +1,6 @@
-import { addPoint, dist, Point, Zero } from '../../shapes';
+import { dist, Point, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
-import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/vertex-bezier';
+import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/VertexBezier';
 import { leftNearestZip, spacedFullZip } from '../../util';
 
 type MergedTo = 'next' | 'previous' | 'none';
@@ -57,9 +57,9 @@ export const makeSpringBezierMaker = (
   return { vertex, shape };
 };
 
-const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
+const toVertex = (s: SpringBezierVertex): Vertex =>
   SmoothAsymm(
-    addPoint(s.position.position, origin),
+    s.position.position,
     s.inGradient.position,
     s.outGradient.position
   );

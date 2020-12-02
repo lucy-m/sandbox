@@ -12,6 +12,9 @@ export const Welcome: React.FC = () => {
         <li>
           <a href={routes.emoji}>Emoji</a>
         </li>
+        <li>
+          <a href={routes.springBone}>Spring Bone</a>
+        </li>
       </ul>
     </div>
   );

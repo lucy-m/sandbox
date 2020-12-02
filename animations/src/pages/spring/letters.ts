@@ -4,7 +4,7 @@ import {
   Smooth,
   SmoothAsymm,
   VertexShape,
-} from '../../shapes/vertex-bezier';
+} from '../../shapes/VertexBezier';
 
 const A = {
   start: Sharp({ x: 0, y: 0 }),

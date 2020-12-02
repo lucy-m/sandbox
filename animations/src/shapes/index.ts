@@ -5,4 +5,4 @@ export * from './svg-path';
 export * from './svg-path-commands';
 export * from './SvgCircle';
 export * from './SvgLine';
-export * from './vertex-bezier';
+export * from './VertexBezier';
