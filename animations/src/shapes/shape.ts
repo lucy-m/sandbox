@@ -1,6 +1,7 @@
 export interface Shape<T> {
   start: T;
   subsequent: T[];
+  closed?: boolean;
 }
 
 const getPoints = <T>(shape: Shape<T>): T[] => [

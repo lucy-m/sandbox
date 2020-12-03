@@ -4,7 +4,9 @@ import { MoveAbs, SvgPathCommand } from './svg-path-commands';
 
 export interface DrawingConfig {
   stroke?: string;
+  fill?: string;
   showMarkers?: boolean;
+  markerSize?: 'small' | 'medium' | 'large';
 }
 
 interface SvgPathProps {
@@ -20,7 +22,8 @@ export const SvgPath: React.FC<SvgPathProps> = (props) => {
     initial.draw()
   );
   const stroke = props.drawingConfig?.stroke ?? 'black';
-  const path = <path d={d} stroke={stroke} fill="none" />;
+  const fill = props.drawingConfig?.fill ?? 'none';
+  const path = <path d={d} stroke={stroke} fill={fill} />;
   if (!props.drawingConfig?.showMarkers) {
     return path;
   }
