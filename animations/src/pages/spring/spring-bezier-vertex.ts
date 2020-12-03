@@ -1,6 +1,11 @@
-import { addPoint, dist, Point, Zero } from '../../shapes';
+import { dist, Point, Shape, Zero } from '../../shapes';
 import { Spring, SpringFn, SpringProperties } from '../../shapes/spring';
-import { SmoothAsymm, Vertex, VertexShape } from '../../shapes/vertex-bezier';
+import {
+  Sharp,
+  SmoothAsymm,
+  Vertex,
+  VertexShape,
+} from '../../shapes/VertexBezier';
 import { leftNearestZip, spacedFullZip } from '../../util';
 
 type MergedTo = 'next' | 'previous' | 'none';
@@ -14,10 +19,7 @@ export interface SpringBezierVertex {
   splitFrom: SplitFrom;
 }
 
-export interface SpringBezierShape {
-  start: SpringBezierVertex;
-  subsequent: SpringBezierVertex[];
-}
+export type SpringBezierShape = Shape<SpringBezierVertex>;
 
 export interface SpringBezierMaker {
   vertex: (v: Vertex) => SpringBezierVertex;
@@ -57,9 +59,9 @@ export const makeSpringBezierMaker = (
   return { vertex, shape };
 };
 
-const toVertex = (s: SpringBezierVertex, origin: Point): Vertex =>
+const toVertex = (s: SpringBezierVertex): Vertex =>
   SmoothAsymm(
-    addPoint(s.position.position, origin),
+    s.position.position,
     s.inGradient.position,
     s.outGradient.position
   );
@@ -390,9 +392,18 @@ const nearestMorph = (
   return gradientCorrectedMorph(springShape, morphSprings);
 };
 
+const getSpringDisplays = (shape: SpringBezierShape): VertexShape[] => {
+  const springs = [shape.start, ...shape.subsequent].map((v) => v.position);
+  return springs.map((spring) => ({
+    start: Sharp(spring.position),
+    subsequent: [Sharp(spring.endPoint)],
+  }));
+};
+
 export const SpringBezierFn = {
   toVertex,
   apply,
   spacedMorph,
   nearestMorph,
+  getSpringDisplays,
 };

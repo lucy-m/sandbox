@@ -1,7 +1,7 @@
 import React from 'react';
-import { addPoint, Point, scale } from './point';
-import { SvgPath } from './svg-path';
+import { addPoint, Point, scale, Zero } from './point';
 import { CurveRel, SvgPathCommand } from './svg-path-commands';
+import { DrawingConfig, SvgPath } from './SvgPath';
 
 export interface Vertex {
   position: Point;
@@ -42,13 +42,33 @@ export const Smooth = (position: Point, gradient: Point): Vertex =>
 export const Sharp = (position: Point): Vertex =>
   Smooth(position, { x: 0, y: 0 });
 
+export const translate = (vertex: Vertex, origin: Point): Vertex => {
+  return SmoothAsymm(
+    addPoint(vertex.position, origin),
+    vertex.inGrad,
+    vertex.outGrad
+  );
+};
+
+export const translateShape = (
+  shape: VertexShape,
+  origin: Point
+): VertexShape => {
+  const start = translate(shape.start, origin);
+  const subsequent = shape.subsequent.map((v) => translate(v, origin));
+
+  return { start, subsequent };
+};
+
 interface VertexBezierProps {
   shape: VertexShape;
-  showMarkers?: boolean;
+  origin?: Point;
+  drawingConfig?: DrawingConfig;
 }
 
 export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
-  const { shape } = props;
+  const origin = props.origin ?? Zero;
+  const shape = translateShape(props.shape, origin);
 
   const start = shape.start.position;
   const allPoints = [shape.start, ...shape.subsequent];
@@ -64,7 +84,7 @@ export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
     <SvgPath
       start={start}
       commands={commands}
-      showMarkers={props.showMarkers}
+      drawingConfig={props.drawingConfig}
     ></SvgPath>
   );
 };
