@@ -14,17 +14,12 @@ import { BoneShape, tick, toSpringShape } from './spring-bone';
 
 interface SpringBoneProps {
   springBone: BoneShape;
+  springProperties: SpringProperties;
   origin?: Point;
   timer: Observable<number>;
   nudge?: Observable<Point>;
   showSprings?: boolean;
 }
-
-const springProperties: SpringProperties = {
-  friction: 70,
-  weight: 10,
-  stiffness: 10,
-};
 
 export const SpringBone: React.FC<SpringBoneProps> = (
   props: SpringBoneProps
@@ -32,7 +27,7 @@ export const SpringBone: React.FC<SpringBoneProps> = (
   const { nudge, timer, springBone } = props;
 
   const [shape, setShape] = React.useState(
-    toSpringShape(props.springBone, springProperties)
+    toSpringShape(props.springBone, props.springProperties)
   );
 
   React.useEffect(() => {

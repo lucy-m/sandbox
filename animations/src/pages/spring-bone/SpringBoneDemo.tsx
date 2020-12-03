@@ -1,13 +1,19 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { p, Point } from '../../shapes';
+import { p, Point, SpringProperties } from '../../shapes';
 import { BoneShape } from './spring-bone';
 import { SpringBone } from './SpringBone';
 
 const bone: BoneShape = {
   start: p(0, 0),
-  subsequent: [p(20, -10), p(50, 10), p(80, -15), p(100, 5), p(160, 5)],
+  subsequent: Array.from({ length: 10 }).map((_, i) => p(i * 10, 0)),
+};
+
+const springProperties: SpringProperties = {
+  friction: 12,
+  weight: 2,
+  stiffness: 2,
 };
 
 const dt = 20;
@@ -24,6 +30,7 @@ export const SpringBoneDemo: React.FC = () => {
       <svg height={400} width={400}>
         <SpringBone
           springBone={bone}
+          springProperties={springProperties}
           origin={p(20, 120)}
           nudge={nudge}
           timer={timer}
