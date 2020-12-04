@@ -1,11 +1,12 @@
 {
   "name": "luce-util",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Common utilities for me",
-  "main": "src/index.ts",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc && copy package.json dist",
+    "publish": "cd dist && npm publish"
   },
   "author": "lucymair",
   "license": "ISC",
