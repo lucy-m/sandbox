@@ -1,0 +1,15 @@
+{
+  "name": "luce-util",
+  "version": "1.0.0",
+  "description": "Common utilities for me",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "author": "lucymair",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^4.1.2"
+  }
+}
