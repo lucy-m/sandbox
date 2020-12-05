@@ -1,7 +1,7 @@
 import React from 'react';
 import { p, Zero } from '../../shapes';
 import { Sharp, VertexBezier, VertexShape } from '../../shapes/VertexBezier';
-import { pathLoad } from './SVG/path-load';
+import { pathLoad } from './path-load';
 
 const shape: VertexShape = {
   start: Sharp(Zero),
