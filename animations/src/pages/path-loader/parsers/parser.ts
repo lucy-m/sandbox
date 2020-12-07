@@ -22,7 +22,15 @@ export interface SmoothCommand {
   control: Point;
 }
 
-export type ParsedCommand = MoveCommand | LineCommand | SmoothCommand;
+export interface CloseCommand {
+  type: 'close';
+}
+
+export type ParsedCommand =
+  | MoveCommand
+  | LineCommand
+  | SmoothCommand
+  | CloseCommand;
 
 export type CommandParser = (
   relative: boolean,
