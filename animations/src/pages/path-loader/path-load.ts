@@ -51,17 +51,17 @@ const parseCommand = (commandStr: string): Attempt<ParsedCommand[]> => {
 
   const relative = letter === lowerLetter;
 
+  const valueRegex = /-?[\d.]+/g;
+  const values = Array.from(commandStr.matchAll(valueRegex)).map(
+    ([match]) => match
+  );
   const tParsedValues = bindMany(
-    commandStr
-      .slice(1)
-      .split(',')
-      .filter((s) => s !== '')
-      .map((s) => {
-        const parsed = Number.parseFloat(s);
-        return isNaN(parsed)
-          ? makeFailure<number>([`Unable to parse ${s} to number`])
-          : makeSuccess(parsed);
-      })
+    values.map((s) => {
+      const parsed = Number.parseFloat(s);
+      return isNaN(parsed)
+        ? makeFailure<number>([`Unable to parse ${s} to number`])
+        : makeSuccess(parsed);
+    })
   );
 
   const parsedCommands: Attempt<ParsedCommand[]> = bind2(
@@ -135,7 +135,6 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
             : command.position;
           const inGrad = getInGradient(command);
           const outGrad = getOutGradient(command, nextCommand);
-          console.log(i, 'in', inGrad, 'out', outGrad);
 
           const vertex = SmoothAsymm(position, inGrad, outGrad);
 
@@ -175,7 +174,7 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
 };
 
 export const pathLoad = (path: string): Attempt<VertexShape[]> => {
-  const commandRegex = /\w[\d.,]*/gi;
+  const commandRegex = /\w[-\d.,]*/gi;
   const commands = Array.from(path.matchAll(commandRegex)).map(
     ([match]) => match
   );

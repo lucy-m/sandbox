@@ -4,7 +4,7 @@ import { VertexBezier } from '../../shapes/VertexBezier';
 import { pathLoad } from './path-load';
 
 const testPath =
-  'M.73,76.59,70.78,1.47S58.6,101,110.37,101s8.63,73.6,8.63,73.6Z';
+  'M22.3,133.8c-8.5,12.9,1,29.5,12.4,23.6s12.2-16.6,2.3-21.8S22.3,133.8,22.3,133.8z';
 const result = pathLoad(testPath);
 console.log(result);
 
