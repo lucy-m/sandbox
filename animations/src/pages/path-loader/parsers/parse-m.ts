@@ -1,6 +1,6 @@
 import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import { p } from '../../../shapes';
-import { CommandParser, ParsedCommand } from './parser';
+import { CommandParser, ParsedCommand } from './parsed-command';
 
 // https://www.w3.org/TR/SVG/paths.html#PathDataMovetoCommands
 

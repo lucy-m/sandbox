@@ -1,7 +1,7 @@
 import { Attempt } from 'luce-util';
 import { p } from '../../../shapes';
 import { parseL } from './parse-l';
-import { ParsedCommand } from './parser';
+import { ParsedCommand } from './parsed-command';
 
 describe('parseL', () => {
   describe('too few values', () => {

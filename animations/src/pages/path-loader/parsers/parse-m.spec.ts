@@ -1,7 +1,7 @@
 import { Attempt } from 'luce-util';
 import { p } from '../../../shapes';
 import { parseM } from './parse-m';
-import { ParsedCommand } from './parser';
+import { ParsedCommand } from './parsed-command';
 
 describe('parseM', () => {
   describe('for two numbers', () => {

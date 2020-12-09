@@ -1,3 +1,4 @@
+import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import React from 'react';
 import { Shape } from '.';
 import { addPoint, Point, scale, Zero } from './point';
@@ -12,6 +13,19 @@ export interface Vertex {
 }
 
 export type VertexShape = Shape<Vertex>;
+
+export const verticesToShape = (
+  vertices: Vertex[],
+  closed: boolean
+): Attempt<VertexShape> => {
+  const start = vertices[0];
+  if (start) {
+    const subsequent = vertices.slice(1);
+    return makeSuccess({ start, subsequent, closed });
+  } else {
+    return makeFailure(['Cannot create empty shape']);
+  }
+};
 
 export const SmoothAsymm = (
   position: Point,

@@ -1,6 +1,6 @@
 import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import { p } from '../../../shapes';
-import { CommandParser, ParsedCommand, SmoothCommand } from './parser';
+import { CommandParser, ParsedCommand, SmoothCommand } from './parsed-command';
 
 // https://www.w3.org/TR/SVG/paths.html#PathDataCubicBezierCommands
 

@@ -1,1 +1,1 @@
-export * from './parser';
+export * from './parsed-command';

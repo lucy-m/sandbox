@@ -1,6 +1,6 @@
 import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import { p } from '../../../shapes';
-import { CommandParser, LineCommand, ParsedCommand } from './parser';
+import { CommandParser, LineCommand, ParsedCommand } from './parsed-command';
 
 export const parseL: CommandParser = (
   relative: boolean,
