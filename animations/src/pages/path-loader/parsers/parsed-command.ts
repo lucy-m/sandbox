@@ -77,6 +77,6 @@ export const getOutGradient = (
       // assume the first control point is coincident with the current point.)
       return scale(getInGradient(command), -1);
     case 'curve':
-      return addPoint(nextCommand.control1, scale(nextCommand.position, -1));
+      return nextCommand.control1;
   }
 };

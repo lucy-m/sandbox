@@ -184,8 +184,6 @@ export const pathLoad = (path: string): Attempt<VertexShape[]> => {
     ([match]) => match
   );
 
-  console.log(commands);
-
   const tParsed = map(bindMany(commands.map(parseCommand)), (commands) =>
     commands.reduce((a, b) => a.concat(b), [])
   );
