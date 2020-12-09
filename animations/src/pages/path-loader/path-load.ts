@@ -22,6 +22,7 @@ import {
   getOutGradient,
   ParsedCommand,
 } from './parsers';
+import { parseC } from './parsers/parse-c';
 import { parseL } from './parsers/parse-l';
 import { parseM } from './parsers/parse-m';
 import { parseS } from './parsers/parse-s';
@@ -44,6 +45,8 @@ const parseCommand = (commandStr: string): Attempt<ParsedCommand[]> => {
         return makeSuccess<CommandType>('line');
       case 'z':
         return makeSuccess<CommandType>('close');
+      case 'c':
+        return makeSuccess<CommandType>('curve');
       default:
         return makeFailure<CommandType>(['Unknown command letter ' + letter]);
     }
@@ -77,6 +80,8 @@ const parseCommand = (commandStr: string): Attempt<ParsedCommand[]> => {
           return parseL(relative, parsedValues);
         case 'close':
           return parseZ(relative, parsedValues);
+        case 'curve':
+          return parseC(relative, parsedValues);
       }
     }
   );
