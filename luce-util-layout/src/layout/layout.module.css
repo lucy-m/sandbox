@@ -1,0 +1,8 @@
+.layoutStack {
+  display: flex;
+  flex-direction: column;
+}
+
+.layoutStack>*+* {
+  margin-top: 16px;
+}
