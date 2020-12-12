@@ -1,5 +1,5 @@
 import { Attempt } from 'luce-util';
-import { addPoint, Point, scale, Zero } from '../../../shapes';
+import { Point, scale, subPoint, Zero } from '../../../shapes';
 
 export type CommandType = 'move' | 'line' | 'smooth' | 'close' | 'curve';
 
@@ -54,9 +54,9 @@ export const getInGradient = (command: ParsedCommand | undefined): Point => {
     case 'move':
       return Zero;
     case 'smooth':
-      return addPoint(command.control, scale(command.position, -1));
+      return subPoint(command.control, command.position);
     case 'curve':
-      return addPoint(command.control2, scale(command.position, -1));
+      return subPoint(command.control2, command.position);
   }
 };
 
@@ -77,6 +77,8 @@ export const getOutGradient = (
       // assume the first control point is coincident with the current point.)
       return scale(getInGradient(command), -1);
     case 'curve':
-      return nextCommand.control1;
+      return nextCommand.relative
+        ? nextCommand.control1
+        : subPoint(nextCommand.control1, nextCommand.position);
   }
 };
