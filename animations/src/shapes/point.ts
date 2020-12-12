@@ -27,5 +27,8 @@ export const scale = (p: Point, scale: number): Point =>
     y: p.y * scale,
   });
 
+export const subPoint = (p1: Point, p2: Point): Point =>
+  addPoint(p1, scale(p2, -1));
+
 export const dist = (p1: Point, p2: Point): number =>
   Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));

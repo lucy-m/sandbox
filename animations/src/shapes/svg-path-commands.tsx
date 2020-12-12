@@ -3,7 +3,7 @@ import { addPoint, Point } from './point';
 import { SvgCircle } from './SvgCircle';
 import { SvgLine } from './SvgLine';
 
-const markerSize = 1.5;
+const markerSize = 2;
 const markerColours = {
   move: 'black',
   line: 'red',
@@ -123,6 +123,14 @@ export const CurveRel = (
       </g>
     );
   };
+
+  return { draw, move, markers };
+};
+
+export const ClosePath = (): SvgPathCommand => {
+  const draw = () => 'z';
+  const move = (p: Point) => p;
+  const markers = (p: Point) => <React.Fragment />;
 
   return { draw, move, markers };
 };

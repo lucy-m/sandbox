@@ -1,6 +1,10 @@
+import { Point } from './point';
+
 export interface Shape<T> {
   start: T;
   subsequent: T[];
+  origin?: Point;
+  closed?: boolean;
 }
 
 const getPoints = <T>(shape: Shape<T>): T[] => [

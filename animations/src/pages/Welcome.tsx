@@ -15,6 +15,9 @@ export const Welcome: React.FC = () => {
         <li>
           <a href={routes.springBone}>Spring Bone</a>
         </li>
+        <li>
+          <a href={routes.pathLoader}>Path Loader</a>
+        </li>
       </ul>
     </div>
   );

@@ -1,6 +1,8 @@
+import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import React from 'react';
+import { Shape } from '.';
 import { addPoint, Point, scale, Zero } from './point';
-import { CurveRel, SvgPathCommand } from './svg-path-commands';
+import { ClosePath, CurveRel, SvgPathCommand } from './svg-path-commands';
 import { DrawingConfig, SvgPath } from './SvgPath';
 
 export interface Vertex {
@@ -10,10 +12,20 @@ export interface Vertex {
   draw: (next: Vertex) => SvgPathCommand;
 }
 
-export interface VertexShape {
-  start: Vertex;
-  subsequent: Vertex[];
-}
+export type VertexShape = Shape<Vertex>;
+
+export const verticesToShape = (
+  vertices: Vertex[],
+  closed: boolean
+): Attempt<VertexShape> => {
+  const start = vertices[0];
+  if (start) {
+    const subsequent = vertices.slice(1);
+    return makeSuccess({ start, subsequent, closed });
+  } else {
+    return makeFailure(['Cannot create empty shape']);
+  }
+};
 
 export const SmoothAsymm = (
   position: Point,
@@ -78,7 +90,8 @@ export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
       const prev = allPoints[i];
       const command = prev.draw(next);
       return [...acc, command];
-    }, []);
+    }, [])
+    .concat(props.shape.closed ? ClosePath() : []);
 
   return (
     <SvgPath
