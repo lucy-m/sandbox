@@ -1,0 +1,23 @@
+@mixin layout-base() {
+  --spacing-base: 16px;
+
+  --spacing-normal: var(--spacing-base);
+  --spacing-snug: calc(var(--spacing-base) * 0.5);
+  --spacing-loose: calc(var(--spacing-base) * 1.5);
+
+  &.normal {
+    --spacing: var(--spacing-normal);
+  }
+
+  &.snug {
+    --spacing: var(--spacing-snug);
+  }
+
+  &.loose {
+    --spacing: var(--spacing-loose);
+  }
+
+  &.none {
+    --spacing: 0;
+  }
+}
