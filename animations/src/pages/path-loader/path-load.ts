@@ -6,6 +6,7 @@ import {
   makeFailure,
   makeSuccess,
   map,
+  valueOr,
 } from 'luce-util';
 import {
   addPoint,
@@ -117,15 +118,15 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
 
       const result = commands.slice(1).reduce((acc, command, i) => {
         if (command.type === 'close') {
-          const shape = verticesToShape(acc.workingVertices, true);
-          const finishedShapes =
-            shape.kind === 'success'
-              ? [...acc.finishedShapes, shape.value]
-              : acc.finishedShapes;
-          const lastPoint =
-            shape.kind === 'success'
-              ? shape.value.start.position
-              : acc.lastPoint;
+          const tShape = verticesToShape(acc.workingVertices, true);
+          const finishedShapes = valueOr(
+            map(tShape, (shape) => [...acc.finishedShapes, shape]),
+            () => acc.finishedShapes
+          );
+          const lastPoint = valueOr(
+            map(tShape, (shape) => shape.start.position),
+            () => acc.lastPoint
+          );
 
           return {
             lastPoint,
@@ -145,11 +146,11 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
 
           if (command.type === 'move') {
             // start a new shape
-            const shape = verticesToShape(acc.workingVertices, false);
-            const finishedShapes =
-              shape.kind === 'success'
-                ? [...acc.finishedShapes, shape.value]
-                : acc.finishedShapes;
+            const tShape = verticesToShape(acc.workingVertices, false);
+            const finishedShapes = valueOr(
+              map(tShape, (shape) => [...acc.finishedShapes, shape]),
+              () => acc.finishedShapes
+            );
             const workingVertices = [vertex];
 
             return {
@@ -167,11 +168,11 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
         }
       }, initial);
 
-      const lastShape = verticesToShape(result.workingVertices, false);
-      const finishedShapes =
-        lastShape.kind === 'success'
-          ? [...result.finishedShapes, lastShape.value]
-          : result.finishedShapes;
+      const tLastShape = verticesToShape(result.workingVertices, false);
+      const finishedShapes = valueOr(
+        map(tLastShape, (lastShape) => [...result.finishedShapes, lastShape]),
+        () => result.finishedShapes
+      );
 
       return makeSuccess(finishedShapes);
     }

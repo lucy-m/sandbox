@@ -1,6 +1,6 @@
 {
   "name": "luce-util",
-  "version": "1.0.5",
+  "version": "1.0.10",
   "description": "Common utilities for me",
   "main": "index.js",
   "scripts": {
