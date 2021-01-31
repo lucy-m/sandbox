@@ -25,3 +25,8 @@ h1, h2, h3 {
   background-color: magenta;
   font-size: 3em;
 }
+
+svg {
+  border: 1px solid black;
+  display: block;
+}

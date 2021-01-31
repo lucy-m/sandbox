@@ -14,7 +14,6 @@ import {
 import { makeSquare } from '../../shapes/square';
 import { getMouseEventCoords } from '../../util';
 import { mediaPlayer } from './media-player';
-import './SpringDemo.css';
 
 const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));

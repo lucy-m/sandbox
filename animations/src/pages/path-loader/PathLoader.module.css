@@ -1,0 +1,18 @@
+.textArea {
+  width: 500px;
+  height: 200px;
+}
+
+.hStack {
+  display: flex;
+  flex-direction: row;
+}
+
+.output {
+  white-space: pre;
+  font-family: monospace;
+}
+
+.output+.output {
+  margin-top: 16px;
+}

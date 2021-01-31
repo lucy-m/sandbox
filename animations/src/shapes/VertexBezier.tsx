@@ -101,3 +101,36 @@ export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
     ></SvgPath>
   );
 };
+
+export const vertexAsString = (v: Vertex): string => {
+  const pointAsString = (p: Point): string => `{ x: ${p.x}, y: ${p.y}}`;
+
+  const position = pointAsString(v.position);
+
+  if (v.inGrad === Zero && v.outGrad === Zero) {
+    return `Sharp(${position})`;
+  }
+
+  const inGrad = pointAsString(v.inGrad);
+  const outGrad = pointAsString(v.outGrad);
+
+  return `SmoothAsymm(${position}, ${inGrad}, ${outGrad})`;
+};
+
+export const shapeAsString = (shape: VertexShape): string => {
+  const start = `start: ${vertexAsString(shape.start)}`;
+  const subsequent = (() => {
+    const entries = shape.subsequent
+      .map((e) => '      ' + vertexAsString(e))
+      .join(',\n');
+
+    return `subsequent: [
+${entries}
+  ]`;
+  })();
+
+  return `{
+    ${start},
+    ${subsequent}
+}`;
+};
