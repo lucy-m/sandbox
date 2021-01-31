@@ -1,6 +1,6 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
-import { mapTo } from 'rxjs/operators';
+import { map, mapTo } from 'rxjs/operators';
 import { letters, makeSpringBezierMaker, SpringBezier, SpringCircle } from '.';
 import {
   p,
@@ -13,6 +13,7 @@ import {
 } from '../../shapes';
 import { makeSquare } from '../../shapes/square';
 import { getMouseEventCoords } from '../../util';
+import { mediaPlayer } from './media-player';
 import './SpringDemo.css';
 
 const dt = 20;
@@ -21,7 +22,7 @@ const timer = interval(dt).pipe(mapTo(dt));
 const bezierMaker = makeSpringBezierMaker(
   {
     friction: 30,
-    stiffness: 3,
+    stiffness: 4,
     weight: 5,
   },
   true
@@ -35,6 +36,14 @@ export const SpringDemo: React.FC = () => {
   const [circleEndPoint] = React.useState(new Subject<Point>());
   const [nudge] = React.useState(new Subject<Point>());
   const [shapeMorph] = React.useState(new Subject<VertexShape>());
+
+  const [playPause] = React.useState(new Subject<'play' | 'pause'>());
+  const leftShape = playPause.pipe(
+    map((s) => (s === 'play' ? mediaPlayer.play : mediaPlayer.pauseLeft))
+  );
+  const rightShape = playPause.pipe(
+    map((s) => (s === 'play' ? mediaPlayer.play : mediaPlayer.pauseRight))
+  );
 
   const onCanvasClick = (e: React.MouseEvent) => {
     circleEndPoint.next(getMouseEventCoords(e));
@@ -69,10 +78,13 @@ export const SpringDemo: React.FC = () => {
   const morphSquare1 = () => shapeMorph.next(square1);
   const morphSquare2 = () => shapeMorph.next(square2);
 
+  const morphPlay = () => playPause.next('play');
+  const morphPause = () => playPause.next('pause');
+
   return (
     <div>
       <h2>Spring</h2>
-      <svg height={400} width={400} id="svg" onClick={onCanvasClick}>
+      <svg height={400} width={600} id="svg" onClick={onCanvasClick}>
         <SpringCircle
           endPoint={circleEndPoint}
           timer={timer}
@@ -90,7 +102,23 @@ export const SpringDemo: React.FC = () => {
           timer={timer}
           started={started}
           morph={shapeMorph}
-          showSprings={true}
+          showSprings={false}
+        />
+        <SpringBezier
+          initial={bezierMaker.shape(mediaPlayer.play)}
+          origin={{ x: 400, y: 300 }}
+          timer={timer}
+          started={started}
+          morph={leftShape}
+          showSprings={false}
+        />
+        <SpringBezier
+          initial={bezierMaker.shape(mediaPlayer.play)}
+          origin={{ x: 400, y: 300 }}
+          timer={timer}
+          started={started}
+          morph={rightShape}
+          showSprings={false}
         />
       </svg>
       <div>
@@ -111,6 +139,8 @@ export const SpringDemo: React.FC = () => {
       <div>
         <button onClick={morphSquare1}>Square 1</button>
         <button onClick={morphSquare2}>Square 2</button>
+        <button onClick={morphPlay}>Play</button>
+        <button onClick={morphPause}>Pause</button>
       </div>
     </div>
   );
