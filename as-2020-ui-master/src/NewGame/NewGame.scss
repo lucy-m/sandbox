@@ -1,0 +1,21 @@
+@import '../mixins';
+
+.character-image {
+  width: 150px;
+}
+
+.question {
+  @include stack-vertical-tight();
+}
+
+.characters {
+  @include stack-horizontal();
+
+  &>* {
+    @include stack-vertical-tight();
+  }
+}
+
+.play-button {
+  padding: $spacing;
+}

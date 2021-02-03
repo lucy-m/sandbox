@@ -1,0 +1,39 @@
+@import './mixins';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.stack:not(.horizontal), .stack.vertical {
+  @include stack-vertical();
+
+  &.tight {
+    @include stack-vertical-tight();
+  }
+}
+.stack.horizontal {
+  @include stack-horizontal();
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+.wrapper {
+  padding: $spacing;
+  max-width: 600px;
+  margin: auto;
+}
