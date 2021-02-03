@@ -1,7 +1,7 @@
 import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import React from 'react';
 import { Shape } from '.';
-import { addPoint, Point, scale, Zero } from './point';
+import { addPoint, isZero, Point, scale, Zero } from './point';
 import { ClosePath, CurveRel, SvgPathCommand } from './svg-path-commands';
 import { DrawingConfig, SvgPath } from './SvgPath';
 
@@ -103,11 +103,12 @@ export const VertexBezier: React.FC<VertexBezierProps> = (props) => {
 };
 
 export const vertexAsString = (v: Vertex): string => {
-  const pointAsString = (p: Point): string => `{ x: ${p.x}, y: ${p.y}}`;
+  const pointAsString = (p: Point): string =>
+    `{ x: ${p.x.toFixed(2)}, y: ${p.y.toFixed(2)}}`;
 
   const position = pointAsString(v.position);
 
-  if (v.inGrad === Zero && v.outGrad === Zero) {
+  if (isZero(v.inGrad) && isZero(v.outGrad)) {
     return `Sharp(${position})`;
   }
 

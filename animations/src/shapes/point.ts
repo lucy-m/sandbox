@@ -32,3 +32,5 @@ export const subPoint = (p1: Point, p2: Point): Point =>
 
 export const dist = (p1: Point, p2: Point): number =>
   Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+export const isZero = (p: Point): boolean => p.x === 0 && p.y === 0;
