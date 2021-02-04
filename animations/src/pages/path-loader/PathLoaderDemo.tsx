@@ -18,7 +18,7 @@ const testPath =
 
 const drawingConfig: DrawingConfig = {
   showMarkers: true,
-  fill: 'hsl(30, 80%, 70%)',
+  // fill: 'hsl(30, 80%, 70%)',
 };
 
 export const PathLoaderDemo: React.FC = () => {
@@ -67,11 +67,13 @@ export const PathLoaderDemo: React.FC = () => {
         <div>
           <h3>Output</h3>
           <div>
+            [
             {output.map((o, i) => (
               <div key={i} className={styles.output}>
-                {o}
+                {o},
               </div>
             ))}
+            ]
           </div>
         </div>
       </div>

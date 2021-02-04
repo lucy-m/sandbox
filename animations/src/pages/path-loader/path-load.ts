@@ -9,7 +9,6 @@ import {
   valueOr,
 } from 'luce-util';
 import {
-  addPoint,
   Point,
   SmoothAsymm,
   Vertex,
@@ -20,10 +19,12 @@ import {
 import {
   CommandType,
   getInGradient,
+  getNextPosition,
   getOutGradient,
   ParsedCommand,
 } from './parsers';
 import { parseC } from './parsers/parse-c';
+import { parseH, parseV } from './parsers/parse-hv';
 import { parseL } from './parsers/parse-l';
 import { parseM } from './parsers/parse-m';
 import { parseS } from './parsers/parse-s';
@@ -44,6 +45,10 @@ const parseCommand = (commandStr: string): Attempt<ParsedCommand[]> => {
         return makeSuccess<CommandType>('smooth');
       case 'l':
         return makeSuccess<CommandType>('line');
+      case 'h':
+        return makeSuccess<CommandType>('horz');
+      case 'v':
+        return makeSuccess<CommandType>('vert');
       case 'z':
         return makeSuccess<CommandType>('close');
       case 'c':
@@ -79,6 +84,10 @@ const parseCommand = (commandStr: string): Attempt<ParsedCommand[]> => {
           return parseS(relative, parsedValues);
         case 'line':
           return parseL(relative, parsedValues);
+        case 'horz':
+          return parseH(relative, parsedValues);
+        case 'vert':
+          return parseV(relative, parsedValues);
         case 'close':
           return parseZ(relative, parsedValues);
         case 'curve':
@@ -136,9 +145,8 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
         } else {
           const nextCommand = commands[i + 2];
 
-          const position = command.relative
-            ? addPoint(acc.lastPoint, command.position)
-            : command.position;
+          const position = getNextPosition(acc.lastPoint, command);
+
           const inGrad = getInGradient(command);
           const outGrad = getOutGradient(position, command, nextCommand);
 

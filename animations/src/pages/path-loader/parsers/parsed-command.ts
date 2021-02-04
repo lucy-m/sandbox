@@ -1,7 +1,14 @@
 import { Attempt } from 'luce-util';
-import { Point, scale, subPoint, Zero } from '../../../shapes';
+import { addPoint, p, Point, scale, subPoint, Zero } from '../../../shapes';
 
-export type CommandType = 'move' | 'line' | 'smooth' | 'close' | 'curve';
+export type CommandType =
+  | 'move'
+  | 'line'
+  | 'horz'
+  | 'vert'
+  | 'smooth'
+  | 'close'
+  | 'curve';
 
 export interface MoveCommand {
   type: 'move';
@@ -13,6 +20,18 @@ export interface LineCommand {
   type: 'line';
   relative: boolean;
   position: Point;
+}
+
+export interface HorzCommand {
+  type: 'horz';
+  relative: boolean;
+  x: number;
+}
+
+export interface VertCommand {
+  type: 'vert';
+  relative: boolean;
+  y: number;
 }
 
 export interface SmoothCommand {
@@ -37,6 +56,8 @@ export interface CurveCommand {
 export type ParsedCommand =
   | MoveCommand
   | LineCommand
+  | HorzCommand
+  | VertCommand
   | SmoothCommand
   | CloseCommand
   | CurveCommand;
@@ -50,6 +71,8 @@ export const getInGradient = (command: ParsedCommand | undefined): Point => {
   switch (command?.type) {
     case undefined:
     case 'line':
+    case 'horz':
+    case 'vert':
     case 'close':
     case 'move':
       return Zero;
@@ -68,6 +91,8 @@ export const getOutGradient = (
   switch (nextCommand?.type) {
     case undefined:
     case 'line':
+    case 'horz':
+    case 'vert':
     case 'close':
     case 'move':
       return Zero;
@@ -81,5 +106,24 @@ export const getOutGradient = (
       return nextCommand.relative
         ? nextCommand.control1
         : subPoint(nextCommand.control1, position);
+  }
+};
+
+export const getNextPosition = (
+  position: Point,
+  command: ParsedCommand
+): Point => {
+  if (command.type === 'horz') {
+    const x = command.relative ? position.x + command.x : command.x;
+    return p(x, position.y);
+  } else if (command.type === 'vert') {
+    const y = command.relative ? position.y + command.y : command.y;
+    return p(position.x, y);
+  } else if (command.type === 'close') {
+    return position;
+  } else {
+    return command.relative
+      ? addPoint(position, command.position)
+      : command.position;
   }
 };
