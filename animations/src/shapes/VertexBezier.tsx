@@ -1,7 +1,8 @@
 import { Attempt, makeFailure, makeSuccess } from 'luce-util';
 import React from 'react';
 import { Shape } from '.';
-import { addPoint, isZero, Point, scale, Zero } from './point';
+import { addPoint, isZero, p, Point, scale, Zero } from './point';
+import { ShapeFn } from './shape';
 import { ClosePath, CurveRel, SvgPathCommand } from './svg-path-commands';
 import { DrawingConfig, SvgPath } from './SvgPath';
 
@@ -70,6 +71,16 @@ export const translateShape = (
   const subsequent = shape.subsequent.map((v) => translate(v, origin));
 
   return { start, subsequent };
+};
+
+export const squishTo = (y: number, shape: VertexShape): VertexShape => {
+  return ShapeFn.map(shape, (v) => {
+    const position = p(v.position.x, y);
+    const inGrad = p(v.inGrad.x, 0);
+    const outGrad = p(v.outGrad.x, 0);
+
+    return SmoothAsymm(position, inGrad, outGrad);
+  });
 };
 
 interface VertexBezierProps {

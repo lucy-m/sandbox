@@ -36,12 +36,36 @@ export const SpringDemo: React.FC = () => {
   const [nudge] = React.useState(new Subject<Point>());
   const [shapeMorph] = React.useState(new Subject<VertexShape>());
 
-  const [playPause] = React.useState(new Subject<'play' | 'pause'>());
+  const [playPause] = React.useState(
+    new Subject<'play' | 'pause' | 'e' | 'eFlat'>()
+  );
   const leftShape = playPause.pipe(
-    map((s) => (s === 'play' ? mediaPlayer.play : mediaPlayer.pauseLeft))
+    map((s) => {
+      switch (s) {
+        case 'play':
+          return mediaPlayer.play;
+        case 'pause':
+          return mediaPlayer.pauseLeft;
+        case 'e':
+          return mediaPlayer.e1;
+        case 'eFlat':
+          return mediaPlayer.eFlat1;
+      }
+    })
   );
   const rightShape = playPause.pipe(
-    map((s) => (s === 'play' ? mediaPlayer.play : mediaPlayer.pauseRight))
+    map((s) => {
+      switch (s) {
+        case 'play':
+          return mediaPlayer.play;
+        case 'pause':
+          return mediaPlayer.pauseRight;
+        case 'e':
+          return mediaPlayer.e2;
+        case 'eFlat':
+          return mediaPlayer.eFlat2;
+      }
+    })
   );
 
   const onCanvasClick = (e: React.MouseEvent) => {
@@ -79,6 +103,8 @@ export const SpringDemo: React.FC = () => {
 
   const morphPlay = () => playPause.next('play');
   const morphPause = () => playPause.next('pause');
+  const morphMediaE = () => playPause.next('e');
+  const morphMediaEFlat = () => playPause.next('eFlat');
 
   return (
     <div>
@@ -140,6 +166,8 @@ export const SpringDemo: React.FC = () => {
         <button onClick={morphSquare2}>Square 2</button>
         <button onClick={morphPlay}>Play</button>
         <button onClick={morphPause}>Pause</button>
+        <button onClick={morphMediaE}>e</button>
+        <button onClick={morphMediaEFlat}>e flat</button>
       </div>
     </div>
   );
