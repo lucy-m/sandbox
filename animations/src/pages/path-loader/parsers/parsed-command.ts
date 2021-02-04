@@ -61,6 +61,7 @@ export const getInGradient = (command: ParsedCommand | undefined): Point => {
 };
 
 export const getOutGradient = (
+  position: Point,
   command: ParsedCommand,
   nextCommand: ParsedCommand | undefined
 ): Point => {
@@ -79,6 +80,6 @@ export const getOutGradient = (
     case 'curve':
       return nextCommand.relative
         ? nextCommand.control1
-        : subPoint(nextCommand.control1, nextCommand.position);
+        : subPoint(nextCommand.control1, position);
   }
 };

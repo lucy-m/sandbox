@@ -107,7 +107,7 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
       const startVertex = SmoothAsymm(
         firstCommand.position,
         Zero,
-        getOutGradient(firstCommand, commands[1])
+        getOutGradient(firstCommand.position, firstCommand, commands[1])
       );
 
       const initial: Acc = {
@@ -140,7 +140,7 @@ const toShape = (commands: ParsedCommand[]): Attempt<VertexShape[]> => {
             ? addPoint(acc.lastPoint, command.position)
             : command.position;
           const inGrad = getInGradient(command);
-          const outGrad = getOutGradient(command, nextCommand);
+          const outGrad = getOutGradient(position, command, nextCommand);
 
           const vertex = SmoothAsymm(position, inGrad, outGrad);
 
