@@ -84,3 +84,22 @@ export const circularMapNode = (
     inTangent,
   };
 };
+
+export const buildNameNodeMap = (root: MapNode): Map<string, MapNode> => {
+  const map = new Map<string, MapNode>();
+
+  const buildInner = (toCheck: MapNode[]): Map<string, MapNode> => {
+    const next = toCheck[0];
+    if (next !== undefined) {
+      if (map.has(next.name)) {
+        throw new Error('Duplicate node names');
+      }
+      map.set(next.name, next);
+      return buildInner(toCheck.slice(1).concat(next.children));
+    } else {
+      return map;
+    }
+  };
+
+  return buildInner([root]);
+};

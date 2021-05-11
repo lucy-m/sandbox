@@ -4,7 +4,7 @@ import { mapTo } from 'rxjs/operators';
 import { p, Point, Spring, SpringFn, Zero } from '../../shapes';
 import './MapNavDemo.css';
 import { MapNodeDisplay } from './MapNode';
-import { circularMapNode, MapNode } from './models/map-node';
+import { buildNameNodeMap, circularMapNode, MapNode } from './models/map-node';
 
 const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));
@@ -16,10 +16,10 @@ const friction = 100;
 const weight = 15;
 
 const children: MapNode[] = [
-  circularMapNode(p(-2000, 0), 'Child1', [], [0, 0], 80, 120),
-  circularMapNode(p(-1200, 4000), 'Child2', [], [0, 0], 80, 60),
-  circularMapNode(p(600, 3000), 'Child3', [], [0, 0], 80, 160),
-  circularMapNode(p(3000, 0), 'Child4', [], [0, 0], 80, -120),
+  circularMapNode(p(-2000, 0), 'Child1', [], [0, 0], 120, 120),
+  circularMapNode(p(-1200, 4000), 'Child2', [], [0, 0], 120, 60),
+  circularMapNode(p(600, 3000), 'Child3', [], [0, 0], 120, 160),
+  circularMapNode(p(3000, 0), 'Child4', [], [0, 0], 120, -120),
   circularMapNode(p(3000, -3800), 'Child5', [], [0, 0], 80, -60),
 ];
 
@@ -31,6 +31,8 @@ const mapNode: MapNode = circularMapNode(
   240,
   0
 );
+
+const nameNodeMap = buildNameNodeMap(mapNode);
 
 export const MapNavDemo: React.FC = () => {
   const [cameraPos, setCameraPos] = React.useState<Spring>(
@@ -52,8 +54,12 @@ export const MapNavDemo: React.FC = () => {
     return () => s.unsubscribe();
   });
 
-  const onGoTo = (p: Point): void => {
-    target.next(p);
+  const onGoTo = (name: string): void => {
+    const node = nameNodeMap.get(name);
+
+    if (node) {
+      target.next(node.position);
+    }
   };
 
   return (

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   addPoint,
   p,
-  Point,
   scale,
   Smooth,
   VertexBezier,
@@ -12,7 +11,7 @@ import { MapNode } from './models/map-node';
 
 interface MapNodeDisplayProps {
   mapNode: MapNode;
-  onGoTo?: (p: Point) => void;
+  onGoTo?: (name: string) => void;
 }
 
 export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
@@ -24,9 +23,9 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
     <MapNodeDisplay key={c.name} mapNode={c} onGoTo={props.onGoTo} />
   ));
 
-  const onGoTo = (p: Point) => {
+  const onGoTo = (name: string) => {
     if (props.onGoTo) {
-      props.onGoTo(p);
+      props.onGoTo(name);
     }
   };
 
@@ -65,14 +64,14 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
         <div
           className="map-node-link-label"
           style={{ left: toLabelPosition.x, top: toLabelPosition.y }}
-          onClick={() => onGoTo(link.to.position)}
+          onClick={() => onGoTo(link.to.name)}
         >
           {link.to.name}
         </div>
         <div
           className="map-node-link-label"
           style={{ left: fromLabelPosition.x, top: fromLabelPosition.y }}
-          onClick={() => onGoTo(link.from.position)}
+          onClick={() => onGoTo(link.from.name)}
         >
           {link.from.name}
         </div>
