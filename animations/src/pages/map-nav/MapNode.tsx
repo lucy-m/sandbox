@@ -1,9 +1,18 @@
 import React from 'react';
-import { addPoint, p, Smooth, VertexBezier, VertexShape } from '../../shapes';
+import {
+  addPoint,
+  p,
+  Point,
+  scale,
+  Smooth,
+  VertexBezier,
+  VertexShape,
+} from '../../shapes';
 import { MapNode } from './models/map-node';
 
 interface MapNodeDisplayProps {
   mapNode: MapNode;
+  onGoTo?: (p: Point) => void;
 }
 
 export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
@@ -12,8 +21,14 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
   const { mapNode } = props;
 
   const children = mapNode.children.map((c) => (
-    <MapNodeDisplay key={c.name} mapNode={c} />
+    <MapNodeDisplay key={c.name} mapNode={c} onGoTo={props.onGoTo} />
   ));
+
+  const onGoTo = (p: Point) => {
+    if (props.onGoTo) {
+      props.onGoTo(p);
+    }
+  };
 
   const nodeDisplay = (() => {
     if (mapNode.kind === 'circular') {
@@ -33,6 +48,38 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
     }
   })();
 
+  const linkLabels = mapNode.links.map((link) => {
+    const key = link.to.name + '-' + link.from.name;
+
+    const toLabelPosition = addPoint(
+      link.from.position,
+      scale(link.from.tangent, -0.4)
+    );
+    const fromLabelPosition = addPoint(
+      link.to.position,
+      scale(link.to.tangent, 0.4)
+    );
+
+    return (
+      <React.Fragment key={key}>
+        <div
+          className="map-node-link-label"
+          style={{ left: toLabelPosition.x, top: toLabelPosition.y }}
+          onClick={() => onGoTo(link.to.position)}
+        >
+          {link.to.name}
+        </div>
+        <div
+          className="map-node-link-label"
+          style={{ left: fromLabelPosition.x, top: fromLabelPosition.y }}
+          onClick={() => onGoTo(link.from.position)}
+        >
+          {link.from.name}
+        </div>
+      </React.Fragment>
+    );
+  });
+
   const links = mapNode.links.map((link) => {
     const key = link.to.name + '-' + link.from.name;
 
@@ -40,7 +87,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
       link.to.position,
       addPoint(link.to.position, link.to.tangent),
       link.from.position,
-      addPoint(link.from.position, link.from.tangent),
+      addPoint(link.from.position, scale(link.from.tangent, -1)),
     ];
 
     const minX = boundingPoints
@@ -58,8 +105,8 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
 
     const left = minX;
     const top = minY;
-    const width = maxX - minX;
-    const height = maxY - minY;
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
 
     const linePosOffset = p(-left, -top);
     const toPoint = addPoint(linePosOffset, link.to.position);
@@ -84,6 +131,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
       {nodeDisplay}
       {children}
       {links}
+      {linkLabels}
     </React.Fragment>
   );
 };

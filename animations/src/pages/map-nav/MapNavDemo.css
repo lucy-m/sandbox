@@ -7,6 +7,16 @@
   overflow: hidden;
 }
 
+.map-nav-camera-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.map-nav-camera {
+  position: absolute;
+}
+
 .map-node-display-wrapper {
   position: absolute;
   border: 1px solid black;
@@ -21,4 +31,12 @@
 
 .map-nav-wrapper svg {
   position: absolute;
+}
+
+.map-node-link-label {
+  position: absolute;
+  background: white;
+  border: 1px solid black;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
 }
