@@ -4,7 +4,12 @@ import { mapTo } from 'rxjs/operators';
 import { p, Point, Spring, SpringFn, Zero } from '../../shapes';
 import './MapNavDemo.css';
 import { MapNodeDisplay } from './MapNode';
-import { buildNameNodeMap, circularMapNode, MapNode } from './models/map-node';
+import {
+  buildNameNodeMap,
+  circularMapNode,
+  MapNode,
+  rectangularMapNode,
+} from './models/map-node';
 
 const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));
@@ -16,16 +21,32 @@ const friction = 100;
 const weight = 15;
 
 const children: MapNode[] = [
-  circularMapNode(p(-2000, 0), 'Child1', [], [0, 0], 120, 120),
-  circularMapNode(p(-1200, 4000), 'Child2', [], [0, 0], 120, 60),
+  circularMapNode(p(-2000, 0), 'Project 1', [], [0, 0], 120, 120),
+  circularMapNode(p(-1200, 4000), 'Project 2', [], [0, 0], 120, 60),
   circularMapNode(p(600, 3000), 'Child3', [], [0, 0], 120, 160),
   circularMapNode(p(3000, 0), 'Child4', [], [0, 0], 120, -120),
-  circularMapNode(p(3000, -3800), 'Child5', [], [0, 0], 80, -60),
+  rectangularMapNode(
+    p(1000, -1200),
+    'Child5',
+    [
+      rectangularMapNode(
+        p(2200, -1800),
+        'Child6',
+        [],
+        'left-to-right',
+        600,
+        800
+      ),
+    ],
+    'bottom-to-top',
+    400,
+    300
+  ),
 ];
 
 const mapNode: MapNode = circularMapNode(
   p(0, 0),
-  'Parent',
+  'Home',
   children,
   [-90, 90],
   240,
@@ -58,7 +79,7 @@ export const MapNavDemo: React.FC = () => {
     const node = nameNodeMap.get(name);
 
     if (node) {
-      target.next(node.position);
+      target.next(node.center);
     }
   };
 

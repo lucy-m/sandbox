@@ -32,3 +32,14 @@ export const subPoint = (p1: Point, p2: Point): Point =>
 
 export const dist = (p1: Point, p2: Point): number =>
   Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+export const magnitude = (p: Point): number => dist(p, Zero);
+
+export const normalise = (p: Point): Point => {
+  const m = magnitude(p);
+  if (m <= Number.EPSILON) {
+    return Zero;
+  } else {
+    return scale(p, 1 / m);
+  }
+};

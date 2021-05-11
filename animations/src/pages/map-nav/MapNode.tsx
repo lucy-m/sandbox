@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   addPoint,
+  normalise,
   p,
   scale,
   Smooth,
@@ -33,12 +34,26 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
     if (mapNode.kind === 'circular') {
       const width = mapNode.radius * 2;
       const height = mapNode.radius * 2;
-      const top = mapNode.position.y - mapNode.radius;
-      const left = mapNode.position.x - mapNode.radius;
+      const top = mapNode.topLeft.y;
+      const left = mapNode.topLeft.x;
 
       return (
         <div
           className="map-node-display-wrapper circular"
+          style={{ top, left, width, height }}
+        >
+          {mapNode.name}
+        </div>
+      );
+    } else if (mapNode.kind === 'rectangular-flow') {
+      const width = mapNode.width;
+      const height = mapNode.height;
+      const top = mapNode.topLeft.y;
+      const left = mapNode.topLeft.x;
+
+      return (
+        <div
+          className="map-node-display-wrapper rectangular-flow"
           style={{ top, left, width, height }}
         >
           {mapNode.name}
@@ -52,11 +67,11 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
 
     const toLabelPosition = addPoint(
       link.from.position,
-      scale(link.from.tangent, -0.4)
+      scale(normalise(link.from.tangent), -50)
     );
     const fromLabelPosition = addPoint(
       link.to.position,
-      scale(link.to.tangent, 0.4)
+      scale(normalise(link.to.tangent), 50)
     );
 
     return (
