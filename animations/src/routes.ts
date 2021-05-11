@@ -3,4 +3,5 @@ export const routes = {
   emoji: '/emoji',
   springBone: '/spring-bone',
   pathLoader: '/path-loader',
+  mapNav: '/map-nav',
 };
