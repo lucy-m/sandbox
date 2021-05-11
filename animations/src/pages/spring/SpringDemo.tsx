@@ -82,7 +82,7 @@ export const SpringDemo: React.FC = () => {
   const morphPause = () => playPause.next('pause');
 
   return (
-    <div>
+    <div className="spring-demo-wrapper">
       <h2>Spring</h2>
       <svg height={400} width={600} id="svg" onClick={onCanvasClick}>
         <SpringCircle

@@ -1,9 +1,4 @@
-import { CartesianToPolar } from './cartesian-to-polar';
-import { PolarToCartesian } from './polar-to-cartesian';
-
-export { PolarPosition } from './polar-position';
-
-export const PolarConverters = {
-  CartesianToPolar,
-  PolarToCartesian
-};
+export * from './cartesian-to-polar';
+export * from './cartesian';
+export * from './polar-position';
+export * from './polar-to-cartesian';

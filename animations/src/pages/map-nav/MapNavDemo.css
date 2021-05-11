@@ -3,4 +3,21 @@
   max-width: 95vw;
   height: 80vh;
   border: 1px solid black;
+  position: relative;
+}
+
+.map-node-display-wrapper {
+  position: absolute;
+  border: 1px solid black;
+}
+
+.circular {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-nav-wrapper svg {
+  position: absolute;
 }
