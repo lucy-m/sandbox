@@ -1,5 +1,5 @@
 import React from 'react';
-import { addPoint, p, SvgLine } from '../../shapes';
+import { addPoint, p, Smooth, VertexBezier, VertexShape } from '../../shapes';
 import { MapNode } from './models/map-node';
 
 interface MapNodeDisplayProps {
@@ -35,20 +35,44 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
 
   const links = mapNode.links.map((link) => {
     const key = link.to.name + '-' + link.from.name;
-    const left = Math.min(link.to.position.x, link.from.position.x);
-    const top = Math.min(link.to.position.y, link.from.position.y);
-    const width = Math.abs(link.to.position.x - link.from.position.x) + 1;
-    const height = Math.abs(link.to.position.y - link.from.position.y) + 1;
+
+    const boundingPoints = [
+      link.to.position,
+      addPoint(link.to.position, link.to.tangent),
+      link.from.position,
+      addPoint(link.from.position, link.from.tangent),
+    ];
+
+    const minX = boundingPoints
+      .map(({ x }) => x)
+      .reduce((a, b) => Math.min(a, b));
+    const maxX = boundingPoints
+      .map(({ x }) => x)
+      .reduce((a, b) => Math.max(a, b));
+    const minY = boundingPoints
+      .map(({ y }) => y)
+      .reduce((a, b) => Math.min(a, b));
+    const maxY = boundingPoints
+      .map(({ y }) => y)
+      .reduce((a, b) => Math.max(a, b));
+
+    const left = minX;
+    const top = minY;
+    const width = maxX - minX;
+    const height = maxY - minY;
 
     const linePosOffset = p(-left, -top);
     const toPoint = addPoint(linePosOffset, link.to.position);
     const fromPoint = addPoint(linePosOffset, link.from.position);
 
-    const line = <SvgLine start={fromPoint} end={toPoint} />;
+    const bezier: VertexShape = {
+      start: Smooth(fromPoint, link.from.tangent),
+      subsequent: [Smooth(toPoint, link.to.tangent)],
+    };
 
     const svg = (
       <svg key={key} width={width} height={height} style={{ top, left }}>
-        {line}
+        <VertexBezier shape={bezier} drawingConfig={{ showMarkers: false }} />
       </svg>
     );
 

@@ -5,11 +5,11 @@ import { MapNodeDisplay } from './MapNode';
 import { circularMapNode, MapNode } from './models/map-node';
 
 const children: MapNode[] = [
-  circularMapNode(p(200, 200), 'Child1', [], [0, 0], 30, 180),
-  circularMapNode(p(200, 400), 'Child2', [], [0, 0], 30, 60),
-  circularMapNode(p(400, 400), 'Child3', [], [0, 0], 30, 60),
-  circularMapNode(p(600, 400), 'Child4', [], [0, 0], 30, -120),
-  circularMapNode(p(600, 200), 'Child5', [], [0, 0], 30, -60),
+  circularMapNode(p(50, 200), 'Child1', [], [0, 0], 80, 120),
+  circularMapNode(p(-20, 800), 'Child2', [], [0, 0], 80, 60),
+  circularMapNode(p(320, 700), 'Child3', [], [0, 0], 80, 160),
+  circularMapNode(p(900, 400), 'Child4', [], [0, 0], 80, -120),
+  circularMapNode(p(800, 20), 'Child5', [], [0, 0], 80, -60),
 ];
 
 const mapNode: MapNode = circularMapNode(
@@ -17,7 +17,7 @@ const mapNode: MapNode = circularMapNode(
   'Parent',
   children,
   [-90, 90],
-  80,
+  120,
   0
 );
 

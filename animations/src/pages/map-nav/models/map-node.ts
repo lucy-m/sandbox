@@ -1,4 +1,4 @@
-import { addPoint, Point } from '../../../shapes';
+import { addPoint, Point, scale } from '../../../shapes';
 import { polarToCartesian } from './polar/polar-to-cartesian';
 
 export type LinkDirection = 'forward' | 'backwards';
@@ -6,6 +6,7 @@ export type LinkDirection = 'forward' | 'backwards';
 export interface MapLinkPoint {
   name: string;
   position: Point;
+  tangent: Point;
 }
 
 export interface MapLink {
@@ -16,6 +17,7 @@ export interface MapLink {
 interface MapNodeBase {
   position: Point;
   inPoint: Point;
+  inTangent: Point;
   name: string;
   children: MapNode[];
   links: MapLink[];
@@ -54,19 +56,22 @@ export const circularMapNode = (
       const theta = startAngle + angleStep * i;
       const localPosition = polarToCartesian({ radius, theta });
       const linkPosition = addPoint(position, localPosition);
+      const tangent = scale(localPosition, -1);
 
-      return { name, position: linkPosition };
+      return { name, position: linkPosition, tangent };
     })();
 
-    const to: MapLinkPoint = { name: c.name, position: c.inPoint };
+    const to: MapLinkPoint = {
+      name: c.name,
+      position: c.inPoint,
+      tangent: c.inTangent,
+    };
 
     return { from, to };
   });
 
-  const inPoint = (() => {
-    const localPosition = polarToCartesian({ radius, theta: inAngle });
-    return addPoint(position, localPosition);
-  })();
+  const inTangent = polarToCartesian({ radius, theta: inAngle });
+  const inPoint = addPoint(position, inTangent);
 
   return {
     kind: 'circular',
@@ -76,5 +81,6 @@ export const circularMapNode = (
     links,
     radius,
     inPoint,
+    inTangent,
   };
 };
