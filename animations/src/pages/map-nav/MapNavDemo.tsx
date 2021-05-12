@@ -1,7 +1,7 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { p, Point, Spring, SpringFn, Zero } from '../../shapes';
+import { addPoint, p, Point, Spring, SpringFn, Zero } from '../../shapes';
 import './MapNavDemo.scss';
 import { MapNodeDisplay } from './MapNode';
 import { MapTheme } from './MapTheme';
@@ -16,6 +16,7 @@ const dt = 20;
 const timer = interval(dt).pipe(mapTo(dt));
 
 const target = new Subject<Point>();
+const nudge = new Subject<Point>();
 
 const stiffness = 20;
 const friction = 100;
@@ -60,6 +61,7 @@ export const MapNavDemo: React.FC = () => {
   const [cameraPos, setCameraPos] = React.useState<Spring>(
     SpringFn.makeSpring(Zero, Zero, Zero, { stiffness, friction, weight })
   );
+  const [followMouse, setFollowMouse] = React.useState(false);
 
   React.useEffect(() => {
     const s = timer.subscribe((dt: number) =>
@@ -76,11 +78,28 @@ export const MapNavDemo: React.FC = () => {
     return () => s.unsubscribe();
   });
 
+  React.useEffect(() => {
+    const s = nudge.subscribe((n) => {
+      const newEndPoint = addPoint(cameraPos.endPoint, n);
+      setCameraPos(SpringFn.setPositionAndEndpoint(cameraPos, newEndPoint));
+    });
+    return () => s.unsubscribe();
+  });
+
   const onGoTo = (name: string): void => {
     const node = nameNodeMap.get(name);
 
     if (node) {
       target.next(node.center);
+    }
+  };
+
+  const onMouseDown = () => setFollowMouse(true);
+  const onMouseUp = () => setFollowMouse(false);
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (followMouse) {
+      const point = p(-e.movementX, -e.movementY);
+      nudge.next(point);
     }
   };
 
@@ -90,7 +109,12 @@ export const MapNavDemo: React.FC = () => {
         Camera position {cameraPos.position.x.toFixed(1)}{' '}
         {cameraPos.position.y.toFixed(1)}
       </div>
-      <div className="map-nav-wrapper" onDrag={(e) => console.log(e)}>
+      <div
+        className="map-nav-wrapper"
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseMove={onMouseMove}
+      >
         <MapTheme cameraPos={cameraPos.position} />
         <div className="map-nav-camera-wrapper">
           <div

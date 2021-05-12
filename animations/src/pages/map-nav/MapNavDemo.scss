@@ -5,6 +5,7 @@
   border: 1px solid black;
   position: relative;
   overflow: hidden;
+  user-select: none;
 }
 
 .map-nav-camera-wrapper {
@@ -41,7 +42,6 @@
   border: 1px solid black;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  user-select: none;
   padding: 4px 8px;
 }
 

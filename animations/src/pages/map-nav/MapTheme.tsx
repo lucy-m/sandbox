@@ -13,7 +13,7 @@ export const MapTheme: React.FC<MapThemeProps> = (props: MapThemeProps) => {
       return 'childish-ornaments';
     }
 
-    if (cameraPos.x > 1000) {
+    if (cameraPos.x > 1800) {
       return 'deep-blue';
     }
 
