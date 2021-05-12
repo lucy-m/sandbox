@@ -2,8 +2,9 @@ import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 import { p, Point, Spring, SpringFn, Zero } from '../../shapes';
-import './MapNavDemo.css';
+import './MapNavDemo.scss';
 import { MapNodeDisplay } from './MapNode';
+import { MapTheme } from './MapTheme';
 import {
   buildNameNodeMap,
   circularMapNode,
@@ -16,9 +17,9 @@ const timer = interval(dt).pipe(mapTo(dt));
 
 const target = new Subject<Point>();
 
-const stiffness = 8;
+const stiffness = 20;
 const friction = 100;
-const weight = 15;
+const weight = 8;
 
 const children: MapNode[] = [
   circularMapNode(p(-2000, 0), 'Project 1', [], [0, 0], 120, 120),
@@ -85,11 +86,19 @@ export const MapNavDemo: React.FC = () => {
 
   return (
     <React.Fragment>
+      <div>
+        Camera position {cameraPos.position.x.toFixed(1)}{' '}
+        {cameraPos.position.y.toFixed(1)}
+      </div>
       <div className="map-nav-wrapper">
+        <MapTheme cameraPos={cameraPos.position} />
         <div className="map-nav-camera-wrapper">
           <div
             className="map-nav-camera"
-            style={{ top: -cameraPos.position.y, left: -cameraPos.position.x }}
+            style={{
+              top: -cameraPos.position.y.toFixed(1),
+              left: -cameraPos.position.x.toFixed(1),
+            }}
           >
             <MapNodeDisplay mapNode={mapNode} onGoTo={onGoTo} />
           </div>

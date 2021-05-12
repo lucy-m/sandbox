@@ -43,3 +43,10 @@ export const normalise = (p: Point): Point => {
     return scale(p, 1 / m);
   }
 };
+
+export const mapPoint = (point: Point, mapFn: (n: number) => number): Point => {
+  const x = mapFn(point.x);
+  const y = mapFn(point.y);
+
+  return p(x, y);
+};
