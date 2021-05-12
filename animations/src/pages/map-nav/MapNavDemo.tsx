@@ -90,7 +90,7 @@ export const MapNavDemo: React.FC = () => {
         Camera position {cameraPos.position.x.toFixed(1)}{' '}
         {cameraPos.position.y.toFixed(1)}
       </div>
-      <div className="map-nav-wrapper">
+      <div className="map-nav-wrapper" onDrag={(e) => console.log(e)}>
         <MapTheme cameraPos={cameraPos.position} />
         <div className="map-nav-camera-wrapper">
           <div

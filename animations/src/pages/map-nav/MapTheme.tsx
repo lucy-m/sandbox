@@ -13,6 +13,10 @@ export const MapTheme: React.FC<MapThemeProps> = (props: MapThemeProps) => {
       return 'childish-ornaments';
     }
 
+    if (cameraPos.x > 1000) {
+      return 'deep-blue';
+    }
+
     return '';
   })();
 
@@ -21,6 +25,7 @@ export const MapTheme: React.FC<MapThemeProps> = (props: MapThemeProps) => {
   return (
     <div className={wrapperClassName}>
       <div className="childish-ornaments-bg bg"></div>
+      <div className="deep-blue-bg bg"></div>
     </div>
   );
 };

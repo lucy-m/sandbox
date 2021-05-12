@@ -119,8 +119,8 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
 
     const left = minX;
     const top = minY;
-    const width = maxX - minX + 1;
-    const height = maxY - minY + 1;
+    const width = maxX - minX;
+    const height = maxY - minY;
 
     const linePosOffset = p(-left, -top);
     const toPoint = addPoint(linePosOffset, link.to.position);
@@ -131,8 +131,16 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
       subsequent: [Smooth(toPoint, link.to.tangent)],
     };
 
+    const viewbox = `-2 -2 ${width + 4} ${height + 4}`;
+
     const svg = (
-      <svg key={key} width={width} height={height} style={{ top, left }}>
+      <svg
+        key={key}
+        width={width + 12}
+        height={height + 12}
+        viewBox={viewbox}
+        style={{ top: top - 6, left: left - 6 }}
+      >
         <VertexBezier shape={bezier} drawingConfig={{ showMarkers: false }} />
       </svg>
     );
