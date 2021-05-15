@@ -1,7 +1,15 @@
 import React from 'react';
 import { interval, Subject } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { addPoint, p, Point, Spring, SpringFn, Zero } from '../../shapes';
+import {
+  addPoint,
+  p,
+  Point,
+  scale,
+  Spring,
+  SpringFn,
+  Zero,
+} from '../../shapes';
 import './MapNavDemo.scss';
 import { MapNodeDisplay } from './MapNode';
 import { MapTheme } from './MapTheme';
@@ -69,6 +77,8 @@ export const MapNavDemo: React.FC = () => {
     SpringFn.makeSpring(Zero, Zero, Zero, { stiffness, friction, weight })
   );
   const [followMouse, setFollowMouse] = React.useState(false);
+  const [lastTouch, setLastTouch] =
+    React.useState<Point | undefined>(undefined);
 
   React.useEffect(() => {
     const s = timer.subscribe((dt: number) =>
@@ -109,6 +119,19 @@ export const MapNavDemo: React.FC = () => {
       nudge.next(point);
     }
   };
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touchPoint = p(e.touches[0].clientX, e.touches[0].clientY);
+
+    if (lastTouch) {
+      const movement = scale(addPoint(lastTouch, scale(touchPoint, -1)), 1);
+      nudge.next(movement);
+    }
+
+    setLastTouch(touchPoint);
+  };
+  const onTouchEnd = () => {
+    setLastTouch(undefined);
+  };
 
   return (
     <div className="map-nav-wrapper">
@@ -121,6 +144,8 @@ export const MapNavDemo: React.FC = () => {
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
+        onTouchEnd={onTouchEnd}
+        onTouchMove={onTouchMove}
       >
         <MapTheme cameraPos={cameraPos.position} />
         <div className="map-nav-camera-wrapper">
