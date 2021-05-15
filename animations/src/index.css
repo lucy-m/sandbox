@@ -12,16 +12,25 @@ code {
     monospace;
 }
 
-body {
-  padding: 16px;
-}
-
 h1, h2, h3 {
-  margin-top: 0;
+  margin: 0;
 }
 
 .emoji-container {
   padding: 20px;
   background-color: magenta;
   font-size: 3em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  width: 100vw;
+  padding: 16px;
+  gap: 8px;
 }

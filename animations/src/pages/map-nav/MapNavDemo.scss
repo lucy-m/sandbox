@@ -1,7 +1,12 @@
 .map-nav-wrapper {
-  width: 120vh;
-  max-width: 95vw;
-  height: 80vh;
+  display: grid;
+  height: 100%;
+  grid-template-rows: auto 1fr;
+}
+
+.map-nav-display {
+  width: 100%;
+  height: 100%;
   border: 1px solid black;
   position: relative;
   overflow: hidden;
@@ -23,6 +28,7 @@
   border: 1px solid black;
   background: white;
   z-index: 1;
+  cursor: pointer;
 }
 
 .circular {
@@ -30,6 +36,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.rectangular-flow {
+  padding: 8px;
 }
 
 .map-nav-wrapper svg {
@@ -43,6 +53,7 @@
   transform: translate(-50%, -50%);
   cursor: pointer;
   padding: 4px 8px;
+  white-space: nowrap;
 }
 
 .map-theme-wrapper {
@@ -81,10 +92,14 @@
 
     .map-node-link-label {
       border-width: 2px;
+      border-color: hsl(120, 50%, 40%);
+      background-color: hsl(120, 50%, 80%);
     }
 
     .rectangular-flow {
       border-width: 4px;
+      border-color: hsl(-20, 50%, 70%);
+      background-color: hsl(-20, 50%, 97%);
     }
 
     path {

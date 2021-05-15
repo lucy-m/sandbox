@@ -18,22 +18,29 @@ const timer = interval(dt).pipe(mapTo(dt));
 const target = new Subject<Point>();
 const nudge = new Subject<Point>();
 
-const stiffness = 20;
+const stiffness = 12;
 const friction = 100;
 const weight = 8;
 
 const children: MapNode[] = [
   circularMapNode(p(-2000, 0), 'Project 1', [], [0, 0], 120, 120),
   circularMapNode(p(-1200, 4000), 'Project 2', [], [0, 0], 120, 60),
-  circularMapNode(p(600, 3000), 'Child3', [], [0, 0], 120, 160),
-  circularMapNode(p(3000, 0), 'Child4', [], [0, 0], 120, -120),
+  circularMapNode(p(600, 3000), 'Project 3', [], [0, 0], 120, 160),
+  circularMapNode(
+    p(3000, 0),
+    'Project 4',
+    [circularMapNode(p(3400, 300), 'Some other info', [], [0, 0], 140, -120)],
+    [0, 90],
+    120,
+    -120
+  ),
   rectangularMapNode(
     p(1000, -1200),
-    'Child5',
+    'Project 5',
     [
       rectangularMapNode(
         p(2200, -1800),
-        'Child6',
+        'Lorem ipsum',
         [],
         'left-to-right',
         600,
@@ -51,7 +58,7 @@ const mapNode: MapNode = circularMapNode(
   'Home',
   children,
   [-90, 90],
-  240,
+  140,
   0
 );
 
@@ -104,13 +111,13 @@ export const MapNavDemo: React.FC = () => {
   };
 
   return (
-    <React.Fragment>
+    <div className="map-nav-wrapper">
       <div>
         Camera position {cameraPos.position.x.toFixed(1)}{' '}
         {cameraPos.position.y.toFixed(1)}
       </div>
       <div
-        className="map-nav-wrapper"
+        className="map-nav-display"
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
@@ -128,6 +135,6 @@ export const MapNavDemo: React.FC = () => {
           </div>
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 };

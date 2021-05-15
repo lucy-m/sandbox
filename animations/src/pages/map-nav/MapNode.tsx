@@ -40,6 +40,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
       return (
         <div
           className="map-node-display-wrapper circular"
+          onClick={() => onGoTo(mapNode.name)}
           style={{ top, left, width, height }}
         >
           {mapNode.name}
@@ -54,6 +55,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
       return (
         <div
           className="map-node-display-wrapper rectangular-flow"
+          onClick={() => onGoTo(mapNode.name)}
           style={{ top, left, width, height }}
         >
           {mapNode.name}
