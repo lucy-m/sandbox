@@ -2,17 +2,20 @@ import React from 'react';
 import { p, Sharp, VertexBezier, VertexShape } from '../../shapes';
 
 export const ParTesDemo: React.FC = () => {
+  const minX = 0;
+  const minY = 0;
+
   const width = 140;
   const height = 90;
-  const skew = -20;
+  const skew = 10;
 
-  const initialH = 220;
-  const initialS = 40;
+  const initialH = 120;
+  const initialS = 20;
   const initialL = 40;
 
   const stepH = 3;
-  const stepS = 1;
-  const stepL = 4;
+  const stepS = 2;
+  const stepL = 1;
 
   const parallelogram: VertexShape = {
     start: Sharp(p(0, 0)),
@@ -26,21 +29,24 @@ export const ParTesDemo: React.FC = () => {
   const xs = Array.from({ length: 10 });
   const ys = Array.from({ length: 10 });
 
-  const parallelograms = xs.flatMap((_, x) =>
-    ys.map((_, y) => {
-      const key = `${x},${y}`;
-      const d = x + y;
+  const parallelograms = xs.flatMap((_, i) =>
+    ys.map((_, j) => {
+      const key = `${i},${j}`;
+      const d = i + j;
       const h = initialH + d * stepH;
       const s = initialS + d * stepS;
       const l = initialL + d * stepL;
 
       const fill = `hsl(${h}, ${s}%, ${l}%)`;
 
+      const x = i * width + j * skew + minX;
+      const y = j * height + minY;
+
       return (
         <VertexBezier
           key={key}
           shape={parallelogram}
-          origin={p(x * width + y * skew, y * height)}
+          origin={p(x, y)}
           drawingConfig={{ fill, stroke: fill }}
         />
       );
@@ -49,7 +55,7 @@ export const ParTesDemo: React.FC = () => {
 
   return (
     <div className="par-tes-wrapper">
-      <svg height={600} width={1200}>
+      <svg height={1000} width={1200}>
         {parallelograms}
       </svg>
     </div>
