@@ -21,6 +21,9 @@ export const Welcome: React.FC = () => {
         <li>
           <a href={routes.mapNav}>Map Nav</a>
         </li>
+        <li>
+          <a href={routes.parTes}>Parallelogram Tesselation</a>
+        </li>
       </ul>
     </div>
   );

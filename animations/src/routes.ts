@@ -4,4 +4,5 @@ export const routes = {
   springBone: '/spring-bone',
   pathLoader: '/path-loader',
   mapNav: '/map-nav',
+  parTes: '/par-tes',
 };

@@ -11,6 +11,7 @@
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.9",
     "@types/react-router-dom": "^5.1.6",
+    "hsl-to-hex": "^1.0.0",
     "luce-util": "^1.0.10",
     "node-sass": "^4.0.0",
     "react": "^17.0.1",
@@ -44,5 +45,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/hsl-to-hex": "^1.0.0"
   }
 }
