@@ -18,6 +18,9 @@ export const Welcome: React.FC = () => {
         <li>
           <a href={routes.pathLoader}>Path Loader</a>
         </li>
+        <li>
+          <a href={routes.parTes}>Parallelogram Tesselation</a>
+        </li>
       </ul>
     </div>
   );

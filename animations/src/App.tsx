@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { EmojiDemo } from './pages/emoji/EmojiDemo';
+import { ParTesDemo } from './pages/par-tes/ParTesDemo';
 import { PathLoaderDemo } from './pages/path-loader/PathLoaderDemo';
 import { SpringDemo } from './pages/spring';
 import { SpringBoneDemo } from './pages/spring-bone/SpringBoneDemo';
@@ -18,6 +19,7 @@ function App() {
         <Route path={routes.emoji} component={EmojiDemo} />
         <Route path={routes.springBone} component={SpringBoneDemo} />
         <Route path={routes.pathLoader} component={PathLoaderDemo} />
+        <Route path={routes.parTes} component={ParTesDemo} />
         <Route path="/" exact={true} component={Welcome} />
       </BrowserRouter>
     </div>
