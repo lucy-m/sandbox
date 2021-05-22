@@ -1,13 +1,14 @@
+import hsl from 'hsl-to-hex';
 import React from 'react';
 import { p, Sharp, VertexBezier, VertexShape } from '../../shapes';
 
 export const ParTesDemo: React.FC = () => {
-  const minX = 0;
+  const minX = 300;
   const minY = 0;
 
   const width = 140;
   const height = 90;
-  const skew = 10;
+  const skew = -10;
 
   const initialH = 120;
   const initialS = 20;
@@ -37,7 +38,7 @@ export const ParTesDemo: React.FC = () => {
       const s = initialS + d * stepS;
       const l = initialL + d * stepL;
 
-      const fill = `hsl(${h}, ${s}%, ${l}%)`;
+      const fill = hsl(h, s, l);
 
       const x = i * width + j * skew + minX;
       const y = j * height + minY;
@@ -55,7 +56,7 @@ export const ParTesDemo: React.FC = () => {
 
   return (
     <div className="par-tes-wrapper">
-      <svg height={1000} width={1200}>
+      <svg height={1000} width={1200} viewBox="0 0 1200 1000">
         {parallelograms}
       </svg>
     </div>
