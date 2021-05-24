@@ -22,6 +22,7 @@ interface MapNodeBase {
   name: string;
   children: MapNode[];
   links: MapLink[];
+  textKey?: string;
 }
 
 export interface CircularMapNode extends MapNodeBase {
@@ -50,7 +51,8 @@ export const circularMapNode = (
   children: MapNode[],
   angleRange: [number, number],
   radius: number,
-  inAngle: number
+  inAngle: number,
+  textKey?: string
 ): CircularMapNode => {
   const startAngle = angleRange[0];
   const angleStep = (() => {
@@ -94,6 +96,7 @@ export const circularMapNode = (
     radius,
     inPoint,
     inTangent,
+    textKey,
   };
 };
 
@@ -103,7 +106,8 @@ export const rectangularMapNode = (
   children: MapNode[],
   direction: RectangularFlowDirection,
   width: number,
-  height: number
+  height: number,
+  textKey?: string
 ): RectangularFlowMapNode => {
   const linkStep = (() => {
     const linkCount = children.length + 1;
@@ -212,6 +216,7 @@ export const rectangularMapNode = (
     height,
     inPoint,
     inTangent,
+    textKey,
   };
 };
 

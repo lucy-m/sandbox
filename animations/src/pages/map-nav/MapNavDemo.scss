@@ -29,6 +29,15 @@
   background: white;
   z-index: 1;
   cursor: pointer;
+  padding: 24px;
+
+  p {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: 16px;
+  }
 }
 
 .circular {
@@ -36,6 +45,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .rectangular-flow {

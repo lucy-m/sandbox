@@ -48,16 +48,18 @@ const children: MapNode[] = [
     [
       rectangularMapNode(
         p(2200, -1800),
-        'Lorem ipsum',
+        'See it in action',
         [],
         'left-to-right',
         600,
-        800
+        800,
+        'Project5Demo'
       ),
     ],
     'bottom-to-top',
     400,
-    300
+    300,
+    'Project5Intro'
   ),
 ];
 
@@ -67,7 +69,8 @@ const mapNode: MapNode = circularMapNode(
   children,
   [-90, 90],
   140,
-  0
+  0,
+  'Home'
 );
 
 const nameNodeMap = buildNameNodeMap(mapNode);

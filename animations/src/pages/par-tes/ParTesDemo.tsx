@@ -10,13 +10,13 @@ export const ParTesDemo: React.FC = () => {
   const height = 90;
   const skew = -10;
 
-  const initialH = 120;
-  const initialS = 20;
-  const initialL = 40;
+  const initialH = 216;
+  const initialS = 0;
+  const initialL = 30;
 
-  const stepH = 3;
-  const stepS = 2;
-  const stepL = 1;
+  const stepH = 0;
+  const stepS = 1;
+  const stepL = -2;
 
   const parallelogram: VertexShape = {
     start: Sharp(p(0, 0)),

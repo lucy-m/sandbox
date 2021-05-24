@@ -9,6 +9,7 @@ import {
   VertexShape,
 } from '../../shapes';
 import { MapNode } from './models/map-node';
+import { getNodeContent } from './NodeContent';
 
 interface MapNodeDisplayProps {
   mapNode: MapNode;
@@ -31,6 +32,8 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
   };
 
   const nodeDisplay = (() => {
+    const content = getNodeContent(mapNode);
+
     if (mapNode.kind === 'circular') {
       const width = mapNode.radius * 2;
       const height = mapNode.radius * 2;
@@ -43,7 +46,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
           onClick={() => onGoTo(mapNode.name)}
           style={{ top, left, width, height }}
         >
-          {mapNode.name}
+          {content}
         </div>
       );
     } else if (mapNode.kind === 'rectangular-flow') {
@@ -58,7 +61,7 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
           onClick={() => onGoTo(mapNode.name)}
           style={{ top, left, width, height }}
         >
-          {mapNode.name}
+          {content}
         </div>
       );
     }
