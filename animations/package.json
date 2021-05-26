@@ -12,6 +12,7 @@
     "@types/react-dom": "^16.9.9",
     "@types/react-router-dom": "^5.1.6",
     "hsl-to-hex": "^1.0.0",
+    "lorem-ipsum": "^2.0.3",
     "luce-util": "^1.0.10",
     "node-sass": "^4.0.0",
     "react": "^17.0.1",

@@ -1,4 +1,4 @@
-import { addPoint, p, Point, scale } from '../../../shapes';
+import { addPoint, p, Point, scale, Zero } from '../../../shapes';
 import { polarToCartesian } from './polar/polar-to-cartesian';
 
 export type LinkDirection = 'forward' | 'backwards';
@@ -43,7 +43,13 @@ export interface RectangularFlowMapNode extends MapNodeBase {
   height: number;
 }
 
-export type MapNode = CircularMapNode | RectangularFlowMapNode;
+export interface RootNode extends MapNodeBase {
+  kind: 'root';
+  width: number;
+  height: number;
+}
+
+export type MapNode = CircularMapNode | RectangularFlowMapNode | RootNode;
 
 export const circularMapNode = (
   center: Point,
@@ -217,6 +223,65 @@ export const rectangularMapNode = (
     inPoint,
     inTangent,
     textKey,
+  };
+};
+
+export const rootNode = (children: MapNode[]): MapNode => {
+  const name = 'Home';
+  const width = 400;
+  const height = 600;
+  const topLeft = p(-width / 2, -height / 2);
+
+  const tangentSize = 200;
+
+  const linkPoints: { localPosition: Point; tangentAngle: number }[] = [
+    { localPosition: p(0, 440), tangentAngle: 90 },
+    { localPosition: p(0, height), tangentAngle: 130 },
+    { localPosition: p(200, height), tangentAngle: 210 },
+    { localPosition: p(width, 580), tangentAngle: 250 },
+    { localPosition: p(width, 440), tangentAngle: 270 },
+  ];
+
+  const links: MapLink[] = children.map((c, i) => {
+    const from: MapLinkPoint = (() => {
+      const predefined = linkPoints[i];
+
+      if (predefined) {
+        const { localPosition, tangentAngle } = predefined;
+
+        const position = addPoint(localPosition, topLeft);
+        const tangent = polarToCartesian({
+          radius: tangentSize,
+          theta: tangentAngle,
+        });
+
+        return { name, position, tangent };
+      } else {
+        return { name, position: Zero, tangent: Zero };
+      }
+    })();
+
+    const to: MapLinkPoint = {
+      name: c.name,
+      position: c.inPoint,
+      tangent: c.inTangent,
+    };
+
+    return { from, to };
+  });
+
+  return {
+    kind: 'root',
+    center: p(0, 0),
+    topLeft,
+    inPoint: Zero,
+    inTangent: Zero,
+    name,
+    children,
+    links,
+    width,
+    height,
+    textKey: 'root',
   };
 };
 

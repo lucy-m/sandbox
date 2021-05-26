@@ -8,6 +8,7 @@ import {
   VertexBezier,
   VertexShape,
 } from '../../shapes';
+import { MapRootNode } from './MapRootNode';
 import { MapNode } from './models/map-node';
 import { getNodeContent } from './NodeContent';
 
@@ -61,9 +62,11 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
           onClick={() => onGoTo(mapNode.name)}
           style={{ top, left, width, height }}
         >
-          {content}
+          <div className="content-wrapper">{content}</div>
         </div>
       );
+    } else {
+      return <MapRootNode mapNode={mapNode} />;
     }
   })();
 
@@ -72,11 +75,11 @@ export const MapNodeDisplay: React.FC<MapNodeDisplayProps> = (
 
     const toLabelPosition = addPoint(
       link.from.position,
-      scale(normalise(link.from.tangent), -50)
+      scale(normalise(link.from.tangent), -60)
     );
     const fromLabelPosition = addPoint(
       link.to.position,
-      scale(normalise(link.to.tangent), 50)
+      scale(normalise(link.to.tangent), 60)
     );
 
     return (

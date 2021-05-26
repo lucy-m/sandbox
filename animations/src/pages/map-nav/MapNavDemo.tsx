@@ -18,6 +18,7 @@ import {
   circularMapNode,
   MapNode,
   rectangularMapNode,
+  rootNode,
 } from './models/map-node';
 
 const dt = 20;
@@ -63,15 +64,7 @@ const children: MapNode[] = [
   ),
 ];
 
-const mapNode: MapNode = circularMapNode(
-  p(0, 0),
-  'Home',
-  children,
-  [-90, 90],
-  140,
-  0,
-  'Home'
-);
+const mapNode: MapNode = rootNode(children);
 
 const nameNodeMap = buildNameNodeMap(mapNode);
 
