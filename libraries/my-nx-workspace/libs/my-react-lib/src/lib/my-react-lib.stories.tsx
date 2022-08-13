@@ -11,4 +11,6 @@ const Template: ComponentStory<typeof MyReactLib> = (args) => (
 );
 
 export const Primary = Template.bind({});
-Primary.args = {};
+Primary.args = {
+  someNumber: 3,
+};

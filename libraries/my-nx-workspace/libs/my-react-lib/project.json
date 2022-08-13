@@ -49,6 +49,13 @@
           "quiet": true
         }
       }
+    },
+    "component-test": {
+      "executor": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "libs/my-react-lib/cypress.config.ts",
+        "testingType": "component"
+      }
     }
   }
 }

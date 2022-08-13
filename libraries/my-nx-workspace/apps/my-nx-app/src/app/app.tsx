@@ -6,7 +6,7 @@ import NxWelcome from './nx-welcome';
 export function App() {
   return (
     <>
-      <MyReactLib />
+      <MyReactLib someNumber={3} />
       <div />
     </>
   );
