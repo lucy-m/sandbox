@@ -1,0 +1,33 @@
+$spacing: 1rem;
+$tight-spacing: $spacing/2;
+
+@mixin stack-vertical() {
+  display: flex;
+  flex-direction: column;
+
+  &>*+* {
+    margin-top: $spacing;
+  }
+}
+
+@mixin stack-vertical-tight {
+  display: flex;
+  flex-direction: column;
+
+  &>*+* {
+    margin-top: $tight-spacing;
+  }
+}
+
+@mixin stack-horizontal {
+  display: flex;
+  flex-direction: row;
+
+  &>*+* {
+    margin-left: $spacing;
+  }
+
+  &.tight>*+* {
+    margin-left: $tight-spacing;
+  }
+}

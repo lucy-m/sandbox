@@ -1,0 +1,9 @@
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  margin-left: -1em;
+}
+
+.cell {
+  margin-left: 1em;
+}
