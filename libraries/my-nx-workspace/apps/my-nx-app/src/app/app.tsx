@@ -1,11 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MyReactLib } from '@my-nx-workspace/my-react-lib';
 import styles from './app.module.scss';
 import NxWelcome from './nx-welcome';
 
 export function App() {
   return (
     <>
-      <NxWelcome title="my-nx-app" />
+      <MyReactLib />
       <div />
     </>
   );

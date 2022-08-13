@@ -3,6 +3,8 @@
   "version": 2,
   "projects": {
     "my-nx-app": "apps/my-nx-app",
-    "my-nx-app-e2e": "apps/my-nx-app-e2e"
+    "my-nx-app-e2e": "apps/my-nx-app-e2e",
+    "my-react-lib": "libs/my-react-lib",
+    "my-react-lib-e2e": "apps/my-react-lib-e2e"
   }
 }
