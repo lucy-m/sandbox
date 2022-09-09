@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@my-nx-workspace/my-react-lib": ["libs/my-react-lib/src/index.ts"]
+      "@my-nx-workspace/my-react-lib": ["libs/my-react-lib/src/index.ts"],
+      "my-lib": ["libs/my-generic-lib/src/index.ts"],
+      "my-react-lib-two": ["libs/my-react-lib-two/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

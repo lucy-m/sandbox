@@ -1,13 +1,16 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MyReactLib } from '@my-nx-workspace/my-react-lib';
-import styles from './app.module.scss';
-import NxWelcome from './nx-welcome';
+import * as myLib from 'my-react-lib-two';
 
 export function App() {
+  const onClick = () => {
+    myLib.openApp('foo', 10);
+  };
+
   return (
     <>
       <MyReactLib someNumber={3} />
-      <div />
+      <div id="foo" />
+      <button onClick={onClick}>mount</button>
     </>
   );
 }
