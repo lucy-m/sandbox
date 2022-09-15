@@ -5,6 +5,7 @@
   <ItemGroup>
     <Compile Include="MyButton.fs" />
     <Compile Include="SliderWithCircle.fs" />
+    <Compile Include="ObservableDemo.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>

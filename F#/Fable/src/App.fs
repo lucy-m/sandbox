@@ -7,6 +7,7 @@ open Components
 let app() =
   Html.div [
     // MyButton.cmpt "Hello" 
+    ObservableDemo.cmpt ()
     SliderWithCircle.cmpt ()
   ]
 
