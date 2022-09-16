@@ -6,13 +6,15 @@ module Point =
     y: double
   }
 
+  let zero: Model = { x = 0.0; y = 0.0 }
+
   let add (a: Model) (b: Model): Model =
     {
       x = a.x + b.x
       y = a.y + b.y
     }
 
-  let scale (a: Model) (s: double): Model =
+  let scale (s: double) (a: Model): Model =
     {
       x = a.x * s
       y = a.y * s
@@ -29,5 +31,7 @@ module Point =
     let y = (a.y - b.y) ** 2.0
 
     (x + y) ** 0.5
+
+  let abs (a: Model): double = dist a zero
 
 type Point = Point.Model

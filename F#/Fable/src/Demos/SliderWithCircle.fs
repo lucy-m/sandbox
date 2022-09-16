@@ -1,4 +1,4 @@
-﻿namespace Components
+﻿namespace Demos
 
 open Sutil
 open Sutil.DOM

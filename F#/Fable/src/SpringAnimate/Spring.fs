@@ -16,16 +16,42 @@ module Spring =
     properties: Properties
   }
 
-  let tick (dt: double) (s: Model): Model =
-    let dp = Point.sub s.position s.endPoint
-    let acceleration =
-      let spring = Point.scale dp s.properties.stiffness
-      let friction = Point.scale s.velocity s.properties.friction
-      let overall = Point.add spring friction
-      Point.scale overall (-1.0 / (dt * s.properties.weight))
+  let isStationary (s: Model): bool =
+    s.position = s.endPoint
+    && s.velocity = Point.zero
 
-    {
-      s with
-        position = Point.add s.position s.velocity
-        velocity = Point.add s.velocity acceleration
-    }
+  let snap (s: Model): Model =
+    if isStationary s
+    then s
+    else
+      let dp = Point.dist s.position s.endPoint
+      let position, velocity =
+        if dp < 0.3 && Point.abs s.velocity < 0.3
+        then s.endPoint, Point.zero
+        else s.position, s.velocity
+
+      {
+        s with
+          position = position
+          velocity = velocity
+      }
+
+  let tick (dt: double) (s: Model): Model =
+    if isStationary s
+    then s
+    else
+      let dp = Point.sub s.position s.endPoint
+      let acceleration =
+        let spring = Point.scale s.properties.stiffness dp
+        let friction = Point.scale s.properties.friction s.velocity
+        let overall = Point.add spring friction
+        Point.scale (-dt / (s.properties.weight)) overall
+
+      {
+        s with
+          position = Point.add s.position s.velocity
+          velocity = Point.add s.velocity acceleration
+      }
+      |> snap
+
+type Spring = Spring.Model
