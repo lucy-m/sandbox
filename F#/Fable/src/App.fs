@@ -9,6 +9,7 @@ let app() =
     // MyButton.cmpt "Hello" 
     ObservableDemo.cmpt ()
     SliderWithCircle.cmpt ()
+    SpringCanvas.cmpt ()
   ]
 
 app() |> Program.mountElement "sutil-app"

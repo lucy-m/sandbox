@@ -3,9 +3,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="JsLib/Rxjs.fs" />
+    <Compile Include="Geometry/Point.fs" />
+    <Compile Include="SpringAnimate/Spring.fs" />
     <Compile Include="MyButton.fs" />
-    <Compile Include="SliderWithCircle.fs" />
+    <Compile Include="SliderWithCircle.fs" /> 
     <Compile Include="ObservableDemo.fs" />
+    <Compile Include="SpringCanvas.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
