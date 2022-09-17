@@ -2,18 +2,16 @@
 
 open System.Text.RegularExpressions
 
-module PathCommands =
+module RawPathCommand =
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
   type Single =
-    | M of double[]
-    | MRel of double[]
-    | L of double[]
-    | LRel of double[]
-    | C of double[]
-    | CRel of double[]
-    | Z
-
-  type Model = Single[]
+  | M of double[]
+  | MRel of double[]
+  | L of double[]
+  | LRel of double[]
+  | C of double[]
+  | CRel of double[]
+  | Z
 
   let commandRegex = new Regex("[MmLlCcZz][\s,\d\.e\-]*")
 
@@ -81,15 +79,14 @@ module PathCommands =
 
     command + value
 
-  let parseString (s: string): Model =
+  let parseString (s: string): Single[] =
     s
     |> splitToCommandsRaw
     |> Array.choose rawToModel
 
-  let stringify (model: Model): string =
+  let stringify (model: Single[]): string =
     model
     |> Array.map commandToString
     |> Array.reduce (fun a b -> a + " " + b)
 
-type PathCommands = PathCommands.Model
-    
+type PathCommand = RawPathCommand.Single

@@ -5,7 +5,8 @@
   <ItemGroup>
     <Compile Include="JsLib/Rxjs.fs" />
     <Compile Include="Geometry/Point.fs" />
-    <Compile Include="Geometry\PathCommands.fs" />
+    <Compile Include="Geometry\RawPathCommands.fs" />
+    <Compile Include="Geometry\PathPointCommand.fs" />
     <Compile Include="SpringAnimate/Spring.fs" />
     <Compile Include="Components\LineDisplay.fs" />
     <Compile Include="Components\SpringDisplay.fs" />
