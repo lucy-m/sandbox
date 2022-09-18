@@ -9,6 +9,7 @@
     <Compile Include="Geometry\PathPointCommand.fs" />
     <Compile Include="SpringAnimate/Spring.fs" />
     <Compile Include="Components\LineDisplay.fs" />
+    <Compile Include="Components\PathCommandDisplay.fs" />
     <Compile Include="Components\SpringDisplay.fs" />
     <Compile Include="Demos\SliderWithCircle.fs" />
     <Compile Include="Demos\ObservableDemo.fs" />

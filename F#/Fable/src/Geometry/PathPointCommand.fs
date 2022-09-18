@@ -2,7 +2,7 @@
 
 module PathPointCommand =
   
-  type Single =
+  type Command =
   | MoveAbs of Point
   | MoveRel of Point
   | LineToAbs of Point
@@ -38,7 +38,7 @@ module PathPointCommand =
       |> Option.Some
     | RawPathCommand.Z -> Option.None
 
-  let fromRawPathCommand (pathCommand: RawPathCommand): Single[] =
+  let fromRawPathCommand (pathCommand: RawPathCommand): Command[] =
     let points =
       pathCommand 
       |> pointsFromPathCommand 
@@ -78,8 +78,8 @@ module PathPointCommand =
         |> List.chunkBySize 3
         |> List.choose (fun points ->
           match points with
-          | endPoint::cp1::cp2::_ ->
-            CubicAbs (endPoint, cp1, cp2) |> Option.Some
+          | cp1::cp2::endPoint::_ ->
+            CubicAbs (cp1, cp2, endPoint) |> Option.Some
           | _ -> Option.None
         )
 
@@ -88,8 +88,8 @@ module PathPointCommand =
         |> List.chunkBySize 3
         |> List.choose (fun points ->
           match points with
-          | endPoint::cp1::cp2::_ ->
-            CubicRel (endPoint, cp1, cp2) |> Option.Some
+          | cp1::cp2::endPoint::_ ->
+            CubicRel (cp1, cp2, endPoint) |> Option.Some
           | _ -> Option.None
         )
         
@@ -99,7 +99,7 @@ module PathPointCommand =
     asList
     |> List.toArray
 
-  let toRawPathCommand (pointCommand: Single): RawPathCommand =
+  let toRawPathCommand (pointCommand: Command): RawPathCommand =
     let values =
       match pointCommand with
       | MoveAbs point
@@ -107,9 +107,9 @@ module PathPointCommand =
       | LineToAbs point
       | LineToRel point ->
         [| point.x; point.y |]
-      | CubicAbs (point, c1, c2)
-      | CubicRel (point, c1, c2) ->
-        [| point; c1; c2 |]
+      | CubicAbs (c1, c2, point)
+      | CubicRel (c1, c2, point) ->
+        [| c1; c2; point |]
         |> Array.collect (fun p -> [| p.x; p.y |])
       | ClosePath -> [||]
 
@@ -122,17 +122,17 @@ module PathPointCommand =
     | CubicRel _ -> RawPathCommand.CRel values
     | ClosePath -> RawPathCommand.Z
 
-  let parseString (s: string): Single[] =
+  let parseString (s: string): Command[] =
     s
     |> RawPathCommand.parseString
     |> Array.collect fromRawPathCommand
 
-  let stringify (commands: Single[]): string =
+  let stringify (commands: Command[]): string =
     commands
     |> Array.map toRawPathCommand
     |> RawPathCommand.stringify
 
-  let translate (dp: Point) (command: Single): Single =
+  let translate (dp: Point) (command: Command): Command =
     let offset = Point.add dp
 
     match command with
@@ -140,7 +140,35 @@ module PathPointCommand =
     | MoveRel p -> MoveRel p
     | LineToAbs p -> LineToAbs (offset p)
     | LineToRel p -> LineToRel p
-    | CubicAbs (p, c1, c2) -> CubicAbs (offset p, offset c1, offset c2)
-    | CubicRel (p, c1, c2) -> CubicRel (p, c1, c2)
+    | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
+    | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
     | ClosePath -> ClosePath
 
+  let scale (s: double) (about: Point) (command: Command): Command =
+    let scale = Point.scale s
+
+    command
+    |> translate (Point.scale -1.0 about)
+    |> function
+        | MoveAbs p -> MoveAbs (scale p)
+        | MoveRel p -> MoveRel (scale p)
+        | LineToAbs p -> LineToAbs (scale p)
+        | LineToRel p -> LineToRel (scale p)
+        | CubicAbs (c1, c2, p) -> CubicAbs (scale c1, scale c2, scale p)
+        | CubicRel (c1, c2, p) -> CubicRel (scale c1, scale c2, scale p)
+        | ClosePath -> ClosePath
+    |> translate about
+
+  let getPosition (cursor: Point) (command: Command): Point =
+    match command with
+    | MoveAbs p
+    | LineToAbs p
+    | CubicAbs (_, _, p)-> p
+
+    | MoveRel dp 
+    | LineToRel dp
+    | CubicRel (_, _, dp)-> Point.add dp cursor
+
+    | ClosePath -> cursor
+
+type PathPointCommand = PathPointCommand.Command
