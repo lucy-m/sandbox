@@ -11,9 +11,7 @@ module PathPointCommand =
   | CubicRel of Point * Point * Point
   | ClosePath
 
-  type Multiple = Single[]
-
-  let pointsFromPathCommand (pathCommand: PathCommand): Point[] Option =
+  let pointsFromPathCommand (pathCommand: RawPathCommand): Point[] Option =
     match pathCommand with
     | RawPathCommand.M values
     | RawPathCommand.MRel values
@@ -40,7 +38,7 @@ module PathPointCommand =
       |> Option.Some
     | RawPathCommand.Z -> Option.None
 
-  let fromPathCommand (pathCommand: PathCommand): Single[] =
+  let fromRawPathCommand (pathCommand: RawPathCommand): Single[] =
     let points =
       pathCommand 
       |> pointsFromPathCommand 
@@ -100,3 +98,49 @@ module PathPointCommand =
 
     asList
     |> List.toArray
+
+  let toRawPathCommand (pointCommand: Single): RawPathCommand =
+    let values =
+      match pointCommand with
+      | MoveAbs point
+      | MoveRel point
+      | LineToAbs point
+      | LineToRel point ->
+        [| point.x; point.y |]
+      | CubicAbs (point, c1, c2)
+      | CubicRel (point, c1, c2) ->
+        [| point; c1; c2 |]
+        |> Array.collect (fun p -> [| p.x; p.y |])
+      | ClosePath -> [||]
+
+    match pointCommand with
+    | MoveAbs _ -> RawPathCommand.M values
+    | MoveRel _ -> RawPathCommand.MRel values
+    | LineToAbs _ -> RawPathCommand.L values
+    | LineToRel _ -> RawPathCommand.LRel values
+    | CubicAbs _ -> RawPathCommand.C values
+    | CubicRel _ -> RawPathCommand.CRel values
+    | ClosePath -> RawPathCommand.Z
+
+  let parseString (s: string): Single[] =
+    s
+    |> RawPathCommand.parseString
+    |> Array.collect fromRawPathCommand
+
+  let stringify (commands: Single[]): string =
+    commands
+    |> Array.map toRawPathCommand
+    |> RawPathCommand.stringify
+
+  let translate (dp: Point) (command: Single): Single =
+    let offset = Point.add dp
+
+    match command with
+    | MoveAbs p -> MoveAbs (offset p)
+    | MoveRel p -> MoveRel p
+    | LineToAbs p -> LineToAbs (offset p)
+    | LineToRel p -> LineToRel p
+    | CubicAbs (p, c1, c2) -> CubicAbs (offset p, offset c1, offset c2)
+    | CubicRel (p, c1, c2) -> CubicRel (p, c1, c2)
+    | ClosePath -> ClosePath
+

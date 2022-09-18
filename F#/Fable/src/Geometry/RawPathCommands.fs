@@ -89,4 +89,4 @@ module RawPathCommand =
     |> Array.map commandToString
     |> Array.reduce (fun a b -> a + " " + b)
 
-type PathCommand = RawPathCommand.Single
+type RawPathCommand = RawPathCommand.Single
