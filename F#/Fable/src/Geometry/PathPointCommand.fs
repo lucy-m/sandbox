@@ -144,8 +144,8 @@ module PathPointCommand =
     | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
     | ClosePath -> ClosePath
 
-  let scale (s: double) (about: Point) (command: Command): Command =
-    let scale = Point.scale s
+  let scale (s: Point) (about: Point) (command: Command): Command =
+    let scale = Point.scaleX s.x >> Point.scaleY s.y
 
     command
     |> translate (Point.scale -1.0 about)
@@ -159,16 +159,52 @@ module PathPointCommand =
         | ClosePath -> ClosePath
     |> translate about
 
-  let getPosition (cursor: Point) (command: Command): Point =
+  let getEndPoint (cursor: Point) (command: Command): Point =
     match command with
     | MoveAbs p
     | LineToAbs p
-    | CubicAbs (_, _, p)-> p
+    | CubicAbs (_, _, p) -> p
 
     | MoveRel dp 
     | LineToRel dp
-    | CubicRel (_, _, dp)-> Point.add dp cursor
+    | CubicRel (_, _, dp) -> Point.add dp cursor
 
     | ClosePath -> cursor
+
+  let commandBoundingBox (startPoint: Point) (endPoint: Point) (command: Command): Point * Point =
+    
+    match command with
+    | MoveAbs _ 
+    | MoveRel _ 
+    | ClosePath -> endPoint, endPoint
+
+    | LineToAbs _
+    | LineToRel _ -> Point.bounding [| startPoint; endPoint |]
+
+    | CubicAbs (c1, c2, _) -> Point.bounding [| startPoint; endPoint; c1; c2 |]
+    
+    | CubicRel (c1Rel, c2Rel, _) ->
+      let c1 = Point.add startPoint c1Rel
+      let c2 = Point.add startPoint c2Rel
+      Point.bounding [| startPoint; endPoint; c1; c2 |]
+
+  let boundingBox (commands: Command[]): Point * Point =
+    let points =
+      commands
+      |> Array.mapFold (fun cursor next ->
+        let nextPosition =
+          getEndPoint cursor next
+        let bounding = commandBoundingBox cursor nextPosition next
+        
+        bounding, nextPosition
+      ) Point.zero
+      |> fst
+
+    let min = points |> Array.map fst |> Point.bounding |> fst
+    let max = points |> Array.map snd |> Point.bounding |> snd
+
+    min, max
+
+
 
 type PathPointCommand = PathPointCommand.Command

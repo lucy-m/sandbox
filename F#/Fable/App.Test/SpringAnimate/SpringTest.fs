@@ -20,7 +20,7 @@ module SpringTest =
 
     [<Test>]
     let ``more friction causes lower speed`` () =
-      let checkFn (original: Spring): unit =
+      let checkFn (original: Spring2d): unit =
         let higher =
           {
             original with
@@ -31,8 +31,8 @@ module SpringTest =
                 }
           }
 
-        let originalTicked = Spring.tick dt original
-        let higherTicked = Spring.tick dt higher
+        let originalTicked = Spring.dim2.tick dt original
+        let higherTicked = Spring.dim2.tick dt higher
 
         Point.abs higherTicked.velocity
         |> should be (lessThanOrEqualTo <| Point.abs originalTicked.velocity)
@@ -41,7 +41,7 @@ module SpringTest =
 
     [<Test>]
     let ``more weight causes less movement`` () =
-      let checkFn (original: Spring): unit =
+      let checkFn (original: Spring2d): unit =
         let higher =
           {
             original with
@@ -52,8 +52,8 @@ module SpringTest =
                 }
           }
 
-        let originalTicked = Spring.tick dt original
-        let higherTicked = Spring.tick dt higher
+        let originalTicked = Spring.dim2.tick dt original
+        let higherTicked = Spring.dim2.tick dt higher
 
         let originalDp = Point.dist original.position originalTicked.position
         let higherDp = Point.dist higher.position higherTicked.position
@@ -65,7 +65,7 @@ module SpringTest =
 
     [<Test>]
     let ``more stiffness causes more movement`` () =
-      let checkFn (original: Spring): unit =
+      let checkFn (original: Spring2d): unit =
         let higher =
           {
             original with
@@ -76,8 +76,8 @@ module SpringTest =
                 }
           }
 
-        let originalTicked = Spring.tick dt original
-        let higherTicked = Spring.tick dt higher
+        let originalTicked = Spring.dim2.tick dt original
+        let higherTicked = Spring.dim2.tick dt higher
 
         let originalDp = Point.dist original.position originalTicked.position
         let higherDp = Point.dist higher.position higherTicked.position

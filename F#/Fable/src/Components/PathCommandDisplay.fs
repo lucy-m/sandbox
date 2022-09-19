@@ -30,13 +30,22 @@ module PathCommandDisplay =
           args.commands
           |> Array.mapFold (fun cursor next ->
             let nextPosition =
-              PathPointCommand.getPosition cursor next
-
-            printfn $"Cursor: {cursor}\nNext: {next}\nPosition: {nextPosition}"
-
+              PathPointCommand.getEndPoint cursor next
             (nextPosition, pointColor next), nextPosition
           ) Point.zero
           |> fst
+
+        let boundingBoxCommands =
+          args.commands
+          |> PathPointCommand.boundingBox
+          |> fun (minP, maxP) ->
+            [|
+              PathPointCommand.MoveAbs minP
+              PathPointCommand.LineToAbs { x = minP.x; y = maxP.y }
+              PathPointCommand.LineToAbs maxP
+              PathPointCommand.LineToAbs { x = maxP.x; y = minP.y }
+              PathPointCommand.ClosePath
+            |]
 
         points
         |> Array.map (fun (p, color) ->
@@ -44,10 +53,21 @@ module PathCommandDisplay =
             Attr.style [
               Css.fill color
             ]
-            Svg.r 3
+            Svg.r 2
             Svg.cx p.x
             Svg.cy p.y
           ]
+        )
+        |> Array.append (
+          [|
+            Svg.svgel "path" [
+              Attr.d (PathPointCommand.stringify boundingBoxCommands)
+              Attr.stroke color.black
+              Attr.style [
+                Css.fill color.transparent
+              ]
+            ]
+          |]
         )
         |> fragment
         

@@ -6,7 +6,7 @@ open SpringAnimate
 open Geometry
 
 module SpringDisplay =
-  let cmpt (spring: Spring) =
+  let cmpt (spring: Spring2d) =
     Svg.g [
       Svg.circle [
         Attr.style [

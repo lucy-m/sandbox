@@ -16,7 +16,7 @@ type SpringArbs() =
       }
     )
 
-  static member genSpring: Gen<Spring> =
+  static member genSpring: Gen<Spring2d> =
     PointArbs.genPoint
     |> Gen.three
     |> Gen.zip SpringArbs.genProperties
@@ -31,5 +31,5 @@ type SpringArbs() =
 
   static member properties (): Arbitrary<Spring.Properties> =
     Arb.fromGen SpringArbs.genProperties
-  static member spring (): Arbitrary<Spring> =
+  static member spring (): Arbitrary<Spring2d> =
     Arb.fromGen SpringArbs.genSpring
