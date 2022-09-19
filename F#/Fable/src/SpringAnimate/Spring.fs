@@ -26,10 +26,12 @@ module Spring =
     abs: 'a -> double
   }
 
+  type 'a Tick = double -> 'a Model -> 'a Model
+
   type 'a MakeSpringTypeResult = {
     isStationary: 'a Model -> bool
     snap: 'a Model -> 'a Model
-    tick: double -> 'a Model -> 'a Model
+    tick: 'a Tick
   }
 
   let makeSpringType (ops: 'a Operations): 'a MakeSpringTypeResult =
@@ -97,5 +99,6 @@ module Spring =
       abs = Point.abs
     }
 
+type 'a Spring = 'a Spring.Model
 type Spring1d = double Spring.Model
 type Spring2d = Point Spring.Model

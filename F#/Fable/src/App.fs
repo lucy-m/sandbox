@@ -10,6 +10,7 @@ let app() =
     //ObservableDemo.cmpt ()
     //SliderWithCircle.cmpt ()
     SpringCanvas.cmpt ()
+    MultiplyCanvas.cmpt ()
   ]
 
 app() |> Program.mountElement "sutil-app"
