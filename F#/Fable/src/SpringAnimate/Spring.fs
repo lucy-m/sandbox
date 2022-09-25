@@ -28,13 +28,14 @@ module Spring =
 
   type 'a Tick = double -> 'a Model -> 'a Model
 
-  type 'a MakeSpringTypeResult = {
+  type 'a MakeTypeResult = {
+    operations: 'a Operations
     isStationary: 'a Model -> bool
     snap: 'a Model -> 'a Model
     tick: 'a Tick
   }
 
-  let makeSpringType (ops: 'a Operations): 'a MakeSpringTypeResult =
+  let makeSpringType (ops: 'a Operations): 'a MakeTypeResult =
     let isStationary (s: 'a Model): bool =
       s.position = s.endPoint
       && s.velocity = ops.zero
@@ -74,6 +75,7 @@ module Spring =
         |> snap
 
     {
+      operations = ops
       isStationary = isStationary
       snap = snap
       tick = tick

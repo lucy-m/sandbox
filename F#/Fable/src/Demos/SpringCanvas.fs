@@ -3,9 +3,7 @@ namespace Demos
 open Sutil
 open Feliz
 
-open SpringAnimate
 open Components
-open JsLib
 open Geometry
 open Stores
 

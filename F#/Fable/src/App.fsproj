@@ -8,14 +8,17 @@
     <Compile Include="Geometry\RawPathCommands.fs" />
     <Compile Include="Geometry\PathPointCommand.fs" />
     <Compile Include="SpringAnimate/Spring.fs" />
+    <Compile Include="SpringAnimate\SpringBone.fs" />
     <Compile Include="Stores\TickingSpring.fs" />
     <Compile Include="Components\LineDisplay.fs" />
     <Compile Include="Components\PathCommandDisplay.fs" />
     <Compile Include="Components\SpringDisplay.fs" />
+    <Compile Include="Components\SpringBoneDisplay.fs" />
     <Compile Include="Demos\SliderWithCircle.fs" />
     <Compile Include="Demos\ObservableDemo.fs" />
     <Compile Include="Demos\MultiplyCanvas.fs" />
     <Compile Include="Demos\SpringCanvas.fs" />
+    <Compile Include="Demos\SpringBoneCanvas.fs" />
     <Compile Include="MyButton.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
