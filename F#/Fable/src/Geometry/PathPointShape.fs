@@ -1,8 +1,7 @@
 ﻿namespace Geometry
 
-module PathPointCommand =
-  
-  type Command =
+module PathPointShape =
+  type BaseCommand =
   | MoveAbs of Point
   | MoveRel of Point
   | LineToAbs of Point
@@ -11,55 +10,46 @@ module PathPointCommand =
   | CubicRel of Point * Point * Point
   | ClosePath
 
-  type Model = {
-    command: Command
+  type Command = {
+    baseCommand: BaseCommand
     startPoint: Point
     endPoint: Point
   }
 
-  let startPoint (m: Model): Point = m.startPoint
-  let endPoint (m: Model): Point = m.endPoint
+  type Model = Command[]
+
+  let startPoint (m: Command): Point = m.startPoint
+  let endPoint (m: Command): Point = m.endPoint
+  let baseCommand (m: Command): BaseCommand = m.baseCommand
+
+  let commandsFromRawPathCommand (pathCommand: RawPathCommand): BaseCommand[] =
+    let pointsFromPathCommand (pathCommand: RawPathCommand): Point[] Option =
+      match pathCommand with
+      | RawPathCommand.M values
+      | RawPathCommand.MRel values
+      | RawPathCommand.L values
+      | RawPathCommand.LRel values
+      | RawPathCommand.C values
+      | RawPathCommand.CRel values ->
+        values
+        |> Array.chunkBySize 2
+        |> Array.choose (fun points ->
+          let tX = points |> Array.tryHead
+          let tY = points |> Array.tail |> Array.tryHead
   
-  let calcEndPoint (cursor: Point) (command: Command): Point =
-    match command with
-    | MoveAbs p
-    | LineToAbs p
-    | CubicAbs (_, _, p) -> p
-
-    | MoveRel dp 
-    | LineToRel dp
-    | CubicRel (_, _, dp) -> Point.add dp cursor
-
-    | ClosePath -> cursor
-
-  let pointsFromPathCommand (pathCommand: RawPathCommand): Point[] Option =
-    match pathCommand with
-    | RawPathCommand.M values
-    | RawPathCommand.MRel values
-    | RawPathCommand.L values
-    | RawPathCommand.LRel values
-    | RawPathCommand.C values
-    | RawPathCommand.CRel values ->
-      values
-      |> Array.chunkBySize 2
-      |> Array.choose (fun points ->
-        let tX = points |> Array.tryHead
-        let tY = points |> Array.tail |> Array.tryHead
-
-        tX |> Option.bind (fun x ->
-          tY
-          |> Option.map (fun y ->
-            {
-              Point.x = x
-              Point.y = y
-            }
+          tX |> Option.bind (fun x ->
+            tY
+            |> Option.map (fun y ->
+              {
+                Point.x = x
+                Point.y = y
+              }
+            )
           )
         )
-      )
-      |> Option.Some
-    | RawPathCommand.Z -> Option.None
+        |> Option.Some
+      | RawPathCommand.Z -> Option.None
 
-  let commandsFromRawPathCommand (pathCommand: RawPathCommand): Command[] =
     let points =
       pathCommand 
       |> pointsFromPathCommand 
@@ -120,23 +110,32 @@ module PathPointCommand =
     asList
     |> List.toArray
 
-  let commandsToModel (commands: Command[]): Model[] =
+  let baseCommandsToShape (commands: BaseCommand[]): Model =
     commands
     |> Array.mapFold (fun cursor next ->
       let endPoint =
-        calcEndPoint cursor next
+        match next with
+        | MoveAbs p
+        | LineToAbs p
+        | CubicAbs (_, _, p) -> p
 
-      let model: Model = {
-        command = next
+        | MoveRel dp 
+        | LineToRel dp
+        | CubicRel (_, _, dp) -> Point.add dp cursor
+
+        | ClosePath -> cursor
+
+      let Command: Command = {
+        baseCommand = next
         startPoint = cursor
         endPoint = endPoint
       }
 
-      model, endPoint
+      Command, endPoint
     ) Point.zero
     |> fst
 
-  let toRawPathCommand (pointCommand: Command): RawPathCommand =
+  let baseCommandToRawPathCommand (pointCommand: BaseCommand): RawPathCommand =
     let values =
       match pointCommand with
       | MoveAbs point
@@ -159,53 +158,56 @@ module PathPointCommand =
     | CubicRel _ -> RawPathCommand.CRel values
     | ClosePath -> RawPathCommand.Z
 
-  let mapCommand (fn: Command -> 'a) (model: Model): 'a =
-    fn model.command
-
-  let parseString (s: string): Model[] =
+  let parseString (s: string): Model =
     s
     |> RawPathCommand.parseString
     |> Array.collect commandsFromRawPathCommand
-    |> commandsToModel
+    |> baseCommandsToShape
 
-  let stringifyCommands (commands: Command[]): string =
+  let stringifyCommands (commands: BaseCommand[]): string =
     commands
-    |> Array.map toRawPathCommand
+    |> Array.map baseCommandToRawPathCommand
     |> RawPathCommand.stringify
 
-  let stringify (model: Model[]): string =
-    model |> Array.map (fun m -> m.command) |> stringifyCommands
+  let stringify (shape: Model): string =
+    shape 
+    |> Array.map baseCommand
+    |> stringifyCommands
 
   let translate (dp: Point) (model: Model): Model =
-    let offset = Point.add dp
+    model
+    |> Array.map (fun command ->
+      let offset = Point.add dp
 
-    let command =
-      match model.command with
-      | MoveAbs p -> MoveAbs (offset p)
-      | MoveRel p -> MoveRel p
-      | LineToAbs p -> LineToAbs (offset p)
-      | LineToRel p -> LineToRel p
-      | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
-      | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
-      | ClosePath -> ClosePath
+      let baseCommand =
+        match command.baseCommand with
+        | MoveAbs p -> MoveAbs (offset p)
+        | MoveRel p -> MoveRel p
+        | LineToAbs p -> LineToAbs (offset p)
+        | LineToRel p -> LineToRel p
+        | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
+        | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
+        | ClosePath -> ClosePath
 
-    let startPoint = offset model.startPoint
-    let endPoint = offset model.endPoint
+      let startPoint = offset command.startPoint
+      let endPoint = offset command.endPoint
 
-    {
-      command = command
-      startPoint = startPoint
-      endPoint = endPoint
-    }
+      {
+        baseCommand = baseCommand
+        startPoint = startPoint
+        endPoint = endPoint
+      }
+
+    )
 
   let scale (s: Point) (about: Point) (model: Model): Model =
     let scale = Point.scaleX s.x >> Point.scaleY s.y
 
     model
     |> translate (Point.scale -1.0 about)
-    |> (fun translated ->
+    |> Array.map (fun translated ->
         let command =
-          match translated.command with
+          match translated.baseCommand with
           | MoveAbs p -> MoveAbs (scale p)
           | MoveRel p -> MoveRel (scale p)
           | LineToAbs p -> LineToAbs (scale p)
@@ -218,18 +220,18 @@ module PathPointCommand =
         let endPoint = scale translated.endPoint
 
         {
-          command = command
+          baseCommand = command
           startPoint = startPoint
           endPoint = endPoint
         }
-    )
-    |> translate about
+      )
+      |> translate about
 
-  let boundingBox (models: Model[]): Point * Point =
+  let boundingBox (model: Model): Point * Point =
     let points = 
-      models 
-      |> Array.map (fun model ->
-        let { command = command; endPoint = endPoint; startPoint = startPoint } = model
+      model 
+      |> Array.map (fun command ->
+        let { baseCommand = command; endPoint = endPoint; startPoint = startPoint } = command
         
         match command with
         | MoveAbs _ 
@@ -252,4 +254,4 @@ module PathPointCommand =
 
     min, max
 
-type PathPointCommand = PathPointCommand.Model
+type PathPointShape = PathPointShape.Model

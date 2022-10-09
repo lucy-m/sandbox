@@ -6,7 +6,7 @@
     <Compile Include="JsLib/Rxjs.fs" />
     <Compile Include="Geometry/Point.fs" />
     <Compile Include="Geometry\RawPathCommands.fs" />
-    <Compile Include="Geometry\PathPointCommand.fs" />
+    <Compile Include="Geometry\PathPointShape.fs" />
     <Compile Include="SpringAnimate/Spring.fs" />
     <Compile Include="SpringAnimate\SpringBone.fs" />
     <Compile Include="Stores\TickingSpring.fs" />

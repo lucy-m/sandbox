@@ -6,22 +6,22 @@ open Feliz
 open Sutil.DOM
 
 module PathCommandDisplay =
-  let pointColor (model: PathPointCommand): string =
-    match model.command with
-    | PathPointCommand.MoveAbs _ -> color.darkMagenta
-    | PathPointCommand.MoveRel _ -> color.magenta
-    | PathPointCommand.LineToAbs _ -> color.teal
-    | PathPointCommand.LineToRel _ -> color.mediumTurqouise
-    | PathPointCommand.CubicAbs _ -> color.darkOrchid
-    | PathPointCommand.CubicRel _ -> color.orchid
-    | PathPointCommand.ClosePath -> color.black
+  let pointColor (command: PathPointShape.Command): string =
+    match command.baseCommand with
+    | PathPointShape.MoveAbs _ -> color.darkMagenta
+    | PathPointShape.MoveRel _ -> color.magenta
+    | PathPointShape.LineToAbs _ -> color.teal
+    | PathPointShape.LineToRel _ -> color.mediumTurqouise
+    | PathPointShape.CubicAbs _ -> color.darkOrchid
+    | PathPointShape.CubicRel _ -> color.orchid
+    | PathPointShape.ClosePath -> color.black
 
-  type Args (commands: PathPointCommand[], ?debug: bool) =
+  type Args (commands: PathPointShape, ?debug: bool) =
     member x.commands = commands
     member x.debug = debug |> Option.defaultValue false
 
   let cmpt (args: Args) =
-    let dString = PathPointCommand.stringify args.commands
+    let dString = PathPointShape.stringify args.commands
 
     let debugDisplay =
       if args.debug
@@ -32,14 +32,14 @@ module PathCommandDisplay =
 
         let boundingBoxCommands =
           args.commands
-          |> PathPointCommand.boundingBox
+          |> PathPointShape.boundingBox
           |> fun (minP, maxP) ->
             [|
-              PathPointCommand.MoveAbs minP
-              PathPointCommand.LineToAbs { x = minP.x; y = maxP.y }
-              PathPointCommand.LineToAbs maxP
-              PathPointCommand.LineToAbs { x = maxP.x; y = minP.y }
-              PathPointCommand.ClosePath
+              PathPointShape.MoveAbs minP
+              PathPointShape.LineToAbs { x = minP.x; y = maxP.y }
+              PathPointShape.LineToAbs maxP
+              PathPointShape.LineToAbs { x = maxP.x; y = minP.y }
+              PathPointShape.ClosePath
             |]
 
         points
@@ -56,7 +56,7 @@ module PathCommandDisplay =
         |> Array.append (
           [|
             Svg.svgel "path" [
-              Attr.d (PathPointCommand.stringifyCommands boundingBoxCommands)
+              Attr.d (PathPointShape.stringifyCommands boundingBoxCommands)
               Attr.stroke color.black
               Attr.style [
                 Css.fill color.transparent
