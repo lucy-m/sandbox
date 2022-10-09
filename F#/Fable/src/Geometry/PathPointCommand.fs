@@ -11,6 +11,24 @@ module PathPointCommand =
   | CubicRel of Point * Point * Point
   | ClosePath
 
+  type Model = {
+    command: Command
+    startPoint: Point
+    endPoint: Point
+  }
+  
+  let getEndPoint (cursor: Point) (command: Command): Point =
+    match command with
+    | MoveAbs p
+    | LineToAbs p
+    | CubicAbs (_, _, p) -> p
+
+    | MoveRel dp 
+    | LineToRel dp
+    | CubicRel (_, _, dp) -> Point.add dp cursor
+
+    | ClosePath -> cursor
+
   let pointsFromPathCommand (pathCommand: RawPathCommand): Point[] Option =
     match pathCommand with
     | RawPathCommand.M values
@@ -38,7 +56,7 @@ module PathPointCommand =
       |> Option.Some
     | RawPathCommand.Z -> Option.None
 
-  let fromRawPathCommand (pathCommand: RawPathCommand): Command[] =
+  let commandsFromRawPathCommand (pathCommand: RawPathCommand): Command[] =
     let points =
       pathCommand 
       |> pointsFromPathCommand 
@@ -99,6 +117,22 @@ module PathPointCommand =
     asList
     |> List.toArray
 
+  let commandsToModel (commands: Command[]): Model[] =
+    commands
+    |> Array.mapFold (fun cursor next ->
+      let endPoint =
+        getEndPoint cursor next
+
+      let model: Model = {
+        command = next
+        startPoint = cursor
+        endPoint = endPoint
+      }
+
+      model, endPoint
+    ) Point.zero
+    |> fst
+
   let toRawPathCommand (pointCommand: Command): RawPathCommand =
     let values =
       match pointCommand with
@@ -122,89 +156,97 @@ module PathPointCommand =
     | CubicRel _ -> RawPathCommand.CRel values
     | ClosePath -> RawPathCommand.Z
 
-  let parseString (s: string): Command[] =
+  let mapCommand (fn: Command -> 'a) (model: Model): 'a =
+    fn model.command
+
+  let parseString (s: string): Model[] =
     s
     |> RawPathCommand.parseString
-    |> Array.collect fromRawPathCommand
+    |> Array.collect commandsFromRawPathCommand
+    |> commandsToModel
 
-  let stringify (commands: Command[]): string =
+  let stringifyCommands (commands: Command[]): string =
     commands
     |> Array.map toRawPathCommand
     |> RawPathCommand.stringify
 
-  let translate (dp: Point) (command: Command): Command =
+  let stringify (model: Model[]): string =
+    model |> Array.map (fun m -> m.command) |> stringifyCommands
+
+  let translate (dp: Point) (model: Model): Model =
     let offset = Point.add dp
 
-    match command with
-    | MoveAbs p -> MoveAbs (offset p)
-    | MoveRel p -> MoveRel p
-    | LineToAbs p -> LineToAbs (offset p)
-    | LineToRel p -> LineToRel p
-    | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
-    | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
-    | ClosePath -> ClosePath
+    let command =
+      match model.command with
+      | MoveAbs p -> MoveAbs (offset p)
+      | MoveRel p -> MoveRel p
+      | LineToAbs p -> LineToAbs (offset p)
+      | LineToRel p -> LineToRel p
+      | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
+      | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
+      | ClosePath -> ClosePath
 
-  let scale (s: Point) (about: Point) (command: Command): Command =
+    let startPoint = offset model.startPoint
+    let endPoint = offset model.endPoint
+
+    {
+      command = command
+      startPoint = startPoint
+      endPoint = endPoint
+    }
+
+  let scale (s: Point) (about: Point) (model: Model): Model =
     let scale = Point.scaleX s.x >> Point.scaleY s.y
 
-    command
+    model
     |> translate (Point.scale -1.0 about)
-    |> function
-        | MoveAbs p -> MoveAbs (scale p)
-        | MoveRel p -> MoveRel (scale p)
-        | LineToAbs p -> LineToAbs (scale p)
-        | LineToRel p -> LineToRel (scale p)
-        | CubicAbs (c1, c2, p) -> CubicAbs (scale c1, scale c2, scale p)
-        | CubicRel (c1, c2, p) -> CubicRel (scale c1, scale c2, scale p)
-        | ClosePath -> ClosePath
+    |> (fun translated ->
+        let command =
+          match translated.command with
+          | MoveAbs p -> MoveAbs (scale p)
+          | MoveRel p -> MoveRel (scale p)
+          | LineToAbs p -> LineToAbs (scale p)
+          | LineToRel p -> LineToRel (scale p)
+          | CubicAbs (c1, c2, p) -> CubicAbs (scale c1, scale c2, scale p)
+          | CubicRel (c1, c2, p) -> CubicRel (scale c1, scale c2, scale p)
+          | ClosePath -> ClosePath
+
+        let startPoint = scale translated.startPoint
+        let endPoint = scale translated.endPoint
+
+        {
+          command = command
+          startPoint = startPoint
+          endPoint = endPoint
+        }
+    )
     |> translate about
 
-  let getEndPoint (cursor: Point) (command: Command): Point =
-    match command with
-    | MoveAbs p
-    | LineToAbs p
-    | CubicAbs (_, _, p) -> p
-
-    | MoveRel dp 
-    | LineToRel dp
-    | CubicRel (_, _, dp) -> Point.add dp cursor
-
-    | ClosePath -> cursor
-
-  let commandBoundingBox (startPoint: Point) (endPoint: Point) (command: Command): Point * Point =
-    
-    match command with
-    | MoveAbs _ 
-    | MoveRel _ 
-    | ClosePath -> endPoint, endPoint
-
-    | LineToAbs _
-    | LineToRel _ -> Point.bounding [| startPoint; endPoint |]
-
-    | CubicAbs (c1, c2, _) -> Point.bounding [| startPoint; endPoint; c1; c2 |]
-    
-    | CubicRel (c1Rel, c2Rel, _) ->
-      let c1 = Point.add startPoint c1Rel
-      let c2 = Point.add startPoint c2Rel
-      Point.bounding [| startPoint; endPoint; c1; c2 |]
-
-  let boundingBox (commands: Command[]): Point * Point =
-    let points =
-      commands
-      |> Array.mapFold (fun cursor next ->
-        let nextPosition =
-          getEndPoint cursor next
-        let bounding = commandBoundingBox cursor nextPosition next
+  let boundingBox (models: Model[]): Point * Point =
+    let points = 
+      models 
+      |> Array.map (fun model ->
+        let { command = command; endPoint = endPoint; startPoint = startPoint } = model
         
-        bounding, nextPosition
-      ) Point.zero
-      |> fst
+        match command with
+        | MoveAbs _ 
+        | MoveRel _ 
+        | ClosePath -> endPoint, endPoint
+
+        | LineToAbs _
+        | LineToRel _ -> Point.bounding [| startPoint; endPoint |]
+
+        | CubicAbs (c1, c2, _) -> Point.bounding [| startPoint; endPoint; c1; c2 |]
+        
+        | CubicRel (c1Rel, c2Rel, _) ->
+          let c1 = Point.add startPoint c1Rel
+          let c2 = Point.add startPoint c2Rel
+          Point.bounding [| startPoint; endPoint; c1; c2 |]
+      )
 
     let min = points |> Array.map fst |> Point.bounding |> fst
     let max = points |> Array.map snd |> Point.bounding |> snd
 
     min, max
 
-
-
-type PathPointCommand = PathPointCommand.Command
+type PathPointCommand = PathPointCommand.Model

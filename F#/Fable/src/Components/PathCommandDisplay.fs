@@ -6,8 +6,8 @@ open Feliz
 open Sutil.DOM
 
 module PathCommandDisplay =
-  let pointColor (command: PathPointCommand): string =
-    match command with
+  let pointColor (model: PathPointCommand): string =
+    match model.command with
     | PathPointCommand.MoveAbs _ -> color.darkMagenta
     | PathPointCommand.MoveRel _ -> color.magenta
     | PathPointCommand.LineToAbs _ -> color.teal
@@ -28,12 +28,7 @@ module PathCommandDisplay =
       then 
         let points =
           args.commands
-          |> Array.mapFold (fun cursor next ->
-            let nextPosition =
-              PathPointCommand.getEndPoint cursor next
-            (nextPosition, pointColor next), nextPosition
-          ) Point.zero
-          |> fst
+          |> Array.map (fun model -> (model.endPoint, pointColor model))
 
         let boundingBoxCommands =
           args.commands
@@ -61,7 +56,7 @@ module PathCommandDisplay =
         |> Array.append (
           [|
             Svg.svgel "path" [
-              Attr.d (PathPointCommand.stringify boundingBoxCommands)
+              Attr.d (PathPointCommand.stringifyCommands boundingBoxCommands)
               Attr.stroke color.black
               Attr.style [
                 Css.fill color.transparent

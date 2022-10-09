@@ -9,7 +9,7 @@ let app() =
     // MyButton.cmpt "Hello" 
     //ObservableDemo.cmpt ()
     //SliderWithCircle.cmpt ()
-    //SpringCanvas.cmpt ()
+    SpringCanvas.cmpt ()
     //MultiplyCanvas.cmpt ()
     SpringBoneCanvas.cmpt ()
   ]
