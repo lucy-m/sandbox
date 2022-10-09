@@ -13,6 +13,7 @@ type SpringArbs() =
         stiffness = s
         friction = f
         weight = w
+        resolution = 0.01
       }
     )
 

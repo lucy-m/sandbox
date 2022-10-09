@@ -30,7 +30,7 @@ module PathCommandsTest =
     let m1 = 
       rawCommands 
       |> Array.head 
-      |> PathPointCommand.fromRawPathCommand
+      |> PathPointCommand.commandsFromRawPathCommand
 
     m1 |> Array.length |> should equal 2
     m1.[0] |> should be (ofCase <@PathPointCommand.MoveRel@>)
@@ -39,7 +39,7 @@ module PathCommandsTest =
     let c1 =
       rawCommands
       |> fun a -> a.[1]
-      |> PathPointCommand.fromRawPathCommand
+      |> PathPointCommand.commandsFromRawPathCommand
 
     c1 |> Array.length |> should equal 1
     c1.[0] |> should be (ofCase <@PathPointCommand.CubicAbs@>)
@@ -47,7 +47,7 @@ module PathCommandsTest =
     let z =
       rawCommands
       |> fun a -> a.[2]
-      |> PathPointCommand.fromRawPathCommand
+      |> PathPointCommand.commandsFromRawPathCommand
     
     z |> Array.length |> should equal 1
     z.[0] |> should be (ofCase <@PathPointCommand.ClosePath@>)
@@ -55,7 +55,7 @@ module PathCommandsTest =
     let c2 =
       rawCommands
       |> fun a -> a.[4]
-      |> PathPointCommand.fromRawPathCommand
+      |> PathPointCommand.commandsFromRawPathCommand
 
     c2 |> Array.length |> should equal 2
     c2.[0] |> should be (ofCase <@PathPointCommand.CubicRel@>)
