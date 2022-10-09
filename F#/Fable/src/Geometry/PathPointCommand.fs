@@ -16,8 +16,11 @@ module PathPointCommand =
     startPoint: Point
     endPoint: Point
   }
+
+  let startPoint (m: Model): Point = m.startPoint
+  let endPoint (m: Model): Point = m.endPoint
   
-  let getEndPoint (cursor: Point) (command: Command): Point =
+  let calcEndPoint (cursor: Point) (command: Command): Point =
     match command with
     | MoveAbs p
     | LineToAbs p
@@ -121,7 +124,7 @@ module PathPointCommand =
     commands
     |> Array.mapFold (fun cursor next ->
       let endPoint =
-        getEndPoint cursor next
+        calcEndPoint cursor next
 
       let model: Model = {
         command = next

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="Geometry\PathCommandsTest.fs" />
+    <Compile Include="Geometry\PathPointCommandTests.fs" />
     <Compile Include="Arbs\PointArbs.fs" />
     <Compile Include="Arbs\SpringAnimateArbs.fs" />
     <Compile Include="SpringAnimate\SpringTest.fs" />

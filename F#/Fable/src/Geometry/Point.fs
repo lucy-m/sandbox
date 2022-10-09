@@ -10,6 +10,7 @@ module Point =
 
   let x (p: Model): double = p.x
   let y (p: Model): double = p.y
+  let make (x: double) (y: double): Model = { x = x; y = y; }
 
   let add (a: Model) (b: Model): Model =
     {
