@@ -7,6 +7,7 @@ module SpringBone =
     initial: 'a Spring
     subsequent: {|spring: 'a Spring; offset: 'a|}[]
   }
+
   type 'a Tick = double -> 'a Model -> 'a Model
 
   type 'a MakeTypeResult = {

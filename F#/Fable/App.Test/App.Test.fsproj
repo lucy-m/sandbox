@@ -12,7 +12,8 @@
     <Compile Include="Geometry\PathPointCommandTests.fs" />
     <Compile Include="Arbs\PointArbs.fs" />
     <Compile Include="Arbs\SpringAnimateArbs.fs" />
-    <Compile Include="SpringAnimate\SpringTest.fs" />
+    <Compile Include="SpringAnimate\SpringTests.fs" />
+    <Compile Include="SpringAnimate\SpringBonedShapeTests.fs" />
     <Compile Include="UnitTest1.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

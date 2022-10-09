@@ -174,31 +174,30 @@ module PathPointShape =
     |> Array.map baseCommand
     |> stringifyCommands
 
+  let translateCommand (dp: Point) (command: Command): Command =
+    let offset = Point.add dp
+    
+    let baseCommand =
+      match command.baseCommand with
+      | MoveAbs p -> MoveAbs (offset p)
+      | MoveRel p -> MoveRel p
+      | LineToAbs p -> LineToAbs (offset p)
+      | LineToRel p -> LineToRel p
+      | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
+      | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
+      | ClosePath -> ClosePath
+    
+    let startPoint = offset command.startPoint
+    let endPoint = offset command.endPoint
+    
+    {
+      baseCommand = baseCommand
+      startPoint = startPoint
+      endPoint = endPoint
+          }
+
   let translate (dp: Point) (model: Model): Model =
-    model
-    |> Array.map (fun command ->
-      let offset = Point.add dp
-
-      let baseCommand =
-        match command.baseCommand with
-        | MoveAbs p -> MoveAbs (offset p)
-        | MoveRel p -> MoveRel p
-        | LineToAbs p -> LineToAbs (offset p)
-        | LineToRel p -> LineToRel p
-        | CubicAbs (c1, c2, p) -> CubicAbs (offset c1, offset c2, offset p)
-        | CubicRel (c1, c2, p) -> CubicRel (c1, c2, p)
-        | ClosePath -> ClosePath
-
-      let startPoint = offset command.startPoint
-      let endPoint = offset command.endPoint
-
-      {
-        baseCommand = baseCommand
-        startPoint = startPoint
-        endPoint = endPoint
-      }
-
-    )
+    model |> Array.map (translateCommand dp)
 
   let scale (s: Point) (about: Point) (model: Model): Model =
     let scale = Point.scaleX s.x >> Point.scaleY s.y

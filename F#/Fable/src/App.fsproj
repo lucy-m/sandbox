@@ -9,6 +9,7 @@
     <Compile Include="Geometry\PathPointShape.fs" />
     <Compile Include="SpringAnimate/Spring.fs" />
     <Compile Include="SpringAnimate\SpringBone.fs" />
+    <Compile Include="SpringAnimate\SpringBonedShape.fs" />
     <Compile Include="Stores\TickingSpring.fs" />
     <Compile Include="Components\LineDisplay.fs" />
     <Compile Include="Components\PathCommandDisplay.fs" />
