@@ -2,7 +2,7 @@
 
 open FsHttp
 
-module SpotifyClient =
+module SpotifyClient =    
   type RefreshTokenResult = {
       access_token: string
   }
@@ -12,19 +12,41 @@ module SpotifyClient =
     items: 'a list
     next: string Option
   }
+
+  type AlbumImage = {
+    url: string
+    height: int
+    width: int
+  }
+
+  type Album = {
+    name: string
+    images: AlbumImage List
+  }
+
+  type Artist = {
+    name: string
+  }
   
-  type SpotifyTrack = {
+  type Track = {
     id: string
     name: string
+    artists: Artist List
+    album: Album
+    is_playable: bool
   }
   
   type GetPlaylistItemsResult = {
-    track: SpotifyTrack
+    track: Track
   }
   
-  type GetPlaylistsResult = {
+  type Playlist = {
     id: string
     name: string
+  }
+
+  type SearchResult = {
+    tracks: Track SpotifyResult
   }
   
   let refreshToken = "AQCIW4zMKT6zbPj8XhzNiyvXhWCJzA0ETuhSH-P-45VEhkyX2r-sZ5nwCLQrxDzcjuUForl5Gi1O99LaD5HfgNcOyN-UeoIFOzTp5TZFc_PfKbshVTV1iSOllPkrjva7MlI"
@@ -49,36 +71,45 @@ module SpotifyClient =
     printfn $"Got access token {accessToken}"
 
     $"Bearer {accessToken}"
+
+  let spotifyGet<'a> (url: string): 'a =
+    http {
+      GET url
+      Authorization authHeader
+      Accept "application/json"
+    }
+    |> Request.send
+    |> Response.toResult
+    |> Result.injectError (fun err ->
+      printfn $"Error getting spotify data {err}"
+    )
+    |> Result.map Response.deserializeJson<'a>
+    |> Result.defaultWith(fun () -> failwith "Failed to get")
   
   let getPaginated<'a> (url: string): 'a list =
     let initialUrl = url + "?limit=20&offset=0"
   
     let rec getPaginatedInner (url: string) (results: 'a list): 'a list =
-      http {
-        GET url
-        Authorization authHeader
-        Accept "application/json"
-      }
-      |> Request.send
-      |> Response.toResult
-      |> Result.injectError (fun err ->
-        printfn $"Error getting paginated spotify data {err}"
-      )
-      |> Result.map (fun v ->
-        v
-        |> Response.deserializeJson<SpotifyResult<'a>>
+      spotifyGet<SpotifyResult<'a>> url
         |> (fun r ->
-          let newResults = List.concat [results; r.items]
-          match r.next with
-          | Some next -> getPaginatedInner next newResults
-          | None -> newResults
+            let newResults = List.concat [results; r.items]
+            match r.next with
+            | Some next -> getPaginatedInner next newResults
+            | None -> newResults
           )
-        )
-      |> Result.defaultValue []
       
     getPaginatedInner initialUrl []
 
-  let getAllPlaylistItems (playlistId: string) =
+  let getAllPlaylistItems (playlistId: string): Track List =
     getPaginated<GetPlaylistItemsResult> $"{baseUrl}playlists/{playlistId}/tracks"
+    |> List.map (fun p -> p.track)
   
-  let getAllPlaylists () = getPaginated<GetPlaylistsResult> (baseUrl + "me/playlists")
+  let getAllPlaylists (): Playlist List =
+    getPaginated<Playlist> $"{baseUrl}me/playlists"
+
+  let searchForTrack (name: string): Track List =
+    let q = System.Web.HttpUtility.UrlEncode(name)
+    let url = $"{baseUrl}search?q={q}&type=track&market=GB"
+
+    spotifyGet<SearchResult> url
+    |> fun sr -> sr.tracks.items
