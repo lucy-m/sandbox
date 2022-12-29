@@ -13,15 +13,15 @@ module SpotifyClient =
     next: string Option
   }
 
-  type AlbumImage = {
+  type Image = {
     url: string
-    height: int
-    width: int
+    height: int Option
+    width: int Option
   }
 
   type Album = {
     name: string
-    images: AlbumImage []
+    images: Image []
   }
 
   type Artist = {
@@ -43,6 +43,7 @@ module SpotifyClient =
   type Playlist = {
     id: string
     name: string
+    images: Image []
   }
 
   type SearchResult = {
@@ -87,7 +88,7 @@ module SpotifyClient =
     |> Result.defaultWith(fun () -> failwith "Failed to get")
   
   let getPaginated<'a> (url: string): 'a [] =
-    let initialUrl = url + "?limit=20&offset=0"
+    let initialUrl = url + "?limit=10&offset=0"
   
     let rec getPaginatedInner (url: string) (results: 'a []): 'a [] =
       spotifyGet<SpotifyResult<'a>> url
@@ -103,9 +104,16 @@ module SpotifyClient =
   let getAllPlaylistItems (playlistId: string): Track [] =
     getPaginated<GetPlaylistItemsResult> $"{baseUrl}playlists/{playlistId}/tracks"
     |> Array.map (fun p -> p.track)
+
+  let mutable cachedPlaylists: Playlist [] Option = None
   
   let getAllPlaylists (): Playlist [] =
-    getPaginated<Playlist> $"{baseUrl}me/playlists"
+    match cachedPlaylists with
+    | Some r -> r
+    | None ->
+      let r = getPaginated<Playlist> $"{baseUrl}me/playlists"
+      cachedPlaylists <- Some r
+      r
 
   let searchForTrack (name: string): Track [] =
     let q = System.Web.HttpUtility.UrlEncode(name)

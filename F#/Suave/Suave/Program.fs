@@ -4,6 +4,7 @@ open Suave.Operators
 open Suave.Successful
 
 open SuaveTest
+open Suave.Writers
 
 let toOkJson (data: 'a) =
   data
@@ -11,19 +12,20 @@ let toOkJson (data: 'a) =
   |> OK
 
 let app =
-  choose
-    [ GET >=> choose
-        [ path "/playlists" >=> 
-            request (fun r -> SpotifyClient.getAllPlaylists() |> toOkJson)
+  choose [
+    GET
+    >=> addHeader "Access-Control-Allow-Origin" "*"
+    >=>
+      choose [ 
+        path "/playlists" >=> 
+          request (fun r -> SpotifyClient.getAllPlaylists() |> toOkJson)
 
-          pathScan "/playlist/%s" 
-            (fun playlistId -> SpotifyClient.getAllPlaylistItems playlistId |> toOkJson)
+        pathScan "/playlist/%s" 
+          (fun playlistId -> SpotifyClient.getAllPlaylistItems playlistId |> toOkJson)
 
-          pathScan "/search/%s"
-            (fun search -> SpotifyClient.searchForTrack search |> toOkJson)
-        ]
-      POST >=> choose
-        [ path "/hello" >=> OK "Hello POST"
-          path "/goodbye" >=> OK "Good bye POST" ] ]
+        pathScan "/search/%s"
+          (fun search -> SpotifyClient.searchForTrack search |> toOkJson)
+      ]
+    ]
 
 startWebServer defaultConfig app
