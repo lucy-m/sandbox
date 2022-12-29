@@ -5,12 +5,23 @@ open Suave.Successful
 
 open SuaveTest
 
+let toOkJson (data: 'a) =
+  data
+  |> Suave.Json.toJson
+  |> System.Text.Encoding.UTF8.GetString
+  |> OK
+
 let app =
   choose
     [ GET >=> choose
-        [ path "/playlists" >=> request (fun r -> OK (SpotifyClient.getAllPlaylists().ToString()))
-          pathScan "/playlist/%s" (fun playlistId -> OK (SpotifyClient.getAllPlaylistItems(playlistId).ToString()))
-          pathScan "/search/%s" (fun search -> OK (SpotifyClient.searchForTrack(search).ToString()))
+        [ path "/playlists" >=> 
+            request (fun r -> SpotifyClient.getAllPlaylists() |> toOkJson)
+
+          pathScan "/playlist/%s" 
+            (fun playlistId -> SpotifyClient.getAllPlaylistItems playlistId |> toOkJson)
+
+          pathScan "/search/%s"
+            (fun search -> SpotifyClient.searchForTrack search |> toOkJson)
         ]
       POST >=> choose
         [ path "/hello" >=> OK "Hello POST"

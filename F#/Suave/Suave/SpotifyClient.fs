@@ -9,7 +9,7 @@ module SpotifyClient =
   
   type SpotifyResult<'a> = {
     href: string
-    items: 'a list
+    items: 'a []
     next: string Option
   }
 
@@ -21,7 +21,7 @@ module SpotifyClient =
 
   type Album = {
     name: string
-    images: AlbumImage List
+    images: AlbumImage []
   }
 
   type Artist = {
@@ -31,7 +31,7 @@ module SpotifyClient =
   type Track = {
     id: string
     name: string
-    artists: Artist List
+    artists: Artist []
     album: Album
     is_playable: bool
   }
@@ -86,28 +86,28 @@ module SpotifyClient =
     |> Result.map Response.deserializeJson<'a>
     |> Result.defaultWith(fun () -> failwith "Failed to get")
   
-  let getPaginated<'a> (url: string): 'a list =
+  let getPaginated<'a> (url: string): 'a [] =
     let initialUrl = url + "?limit=20&offset=0"
   
-    let rec getPaginatedInner (url: string) (results: 'a list): 'a list =
+    let rec getPaginatedInner (url: string) (results: 'a []): 'a [] =
       spotifyGet<SpotifyResult<'a>> url
         |> (fun r ->
-            let newResults = List.concat [results; r.items]
+            let newResults = Array.concat [|results; r.items|]
             match r.next with
             | Some next -> getPaginatedInner next newResults
             | None -> newResults
           )
       
-    getPaginatedInner initialUrl []
+    getPaginatedInner initialUrl [||]
 
-  let getAllPlaylistItems (playlistId: string): Track List =
+  let getAllPlaylistItems (playlistId: string): Track [] =
     getPaginated<GetPlaylistItemsResult> $"{baseUrl}playlists/{playlistId}/tracks"
-    |> List.map (fun p -> p.track)
+    |> Array.map (fun p -> p.track)
   
-  let getAllPlaylists (): Playlist List =
+  let getAllPlaylists (): Playlist [] =
     getPaginated<Playlist> $"{baseUrl}me/playlists"
 
-  let searchForTrack (name: string): Track List =
+  let searchForTrack (name: string): Track [] =
     let q = System.Web.HttpUtility.UrlEncode(name)
     let url = $"{baseUrl}search?q={q}&type=track&market=GB"
 
