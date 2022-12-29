@@ -7,8 +7,7 @@ open SuaveTest
 
 let toOkJson (data: 'a) =
   data
-  |> Suave.Json.toJson
-  |> System.Text.Encoding.UTF8.GetString
+  |> System.Text.Json.JsonSerializer.Serialize
   |> OK
 
 let app =
