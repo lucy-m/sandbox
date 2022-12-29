@@ -48,7 +48,16 @@ module Spring =
         let position, velocity =
           if dp < s.properties.resolution && ops.abs s.velocity < s.properties.resolution
           then s.endPoint, ops.zero
-          else s.position, s.velocity
+          else 
+            let position = s.position
+            let speed = ops.abs s.velocity
+            let maxSpeed = s.properties.resolution * 20.0
+            let velocityScale =
+              min (maxSpeed / speed) 1.0
+            let velocity =
+              ops.scale velocityScale s.velocity
+
+            position, velocity
 
         {
           s with

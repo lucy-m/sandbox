@@ -158,11 +158,37 @@ module PathPointShape =
     | CubicRel _ -> RawPathCommand.CRel values
     | ClosePath -> RawPathCommand.Z
 
+  let makeAllAbsolute (shape: Model): Model =
+    shape
+    |> Array.map (fun command ->
+      let baseCommand =
+        match command.baseCommand with
+        | MoveAbs _
+        | LineToAbs _
+        | CubicAbs _
+        | ClosePath -> command.baseCommand
+        | MoveRel dp -> MoveAbs (Point.add command.startPoint dp)
+        | LineToRel dp -> LineToAbs (Point.add command.startPoint dp)
+        | CubicRel (c1, c2, dp) ->
+            CubicAbs (
+              Point.add command.startPoint c1,
+              Point.add command.startPoint c2,
+              Point.add command.startPoint dp
+            )
+
+      {
+        baseCommand = baseCommand
+        startPoint = command.startPoint
+        endPoint = command.endPoint
+      }
+    )
+
   let parseString (s: string): Model =
     s
     |> RawPathCommand.parseString
     |> Array.collect commandsFromRawPathCommand
     |> baseCommandsToShape
+    |> makeAllAbsolute
 
   let stringifyCommands (commands: BaseCommand[]): string =
     commands

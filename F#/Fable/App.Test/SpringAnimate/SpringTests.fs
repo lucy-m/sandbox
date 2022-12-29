@@ -6,6 +6,7 @@ open FsCheck
 open SpringAnimate
 open Arbs
 open Geometry
+open System
 
 [<TestFixture>]
 module SpringTest =
@@ -34,8 +35,13 @@ module SpringTest =
         let originalTicked = Spring.dim2.tick dt original
         let higherTicked = Spring.dim2.tick dt higher
 
-        Point.abs higherTicked.velocity
-        |> should be (lessThanOrEqualTo <| Point.abs originalTicked.velocity)
+        let roundVal (v: double) = Math.Round(v, 3)
+
+        let higherSpeed = Point.abs higherTicked.velocity |> roundVal
+        let originalSpeed = Point.abs originalTicked.velocity |> roundVal
+
+        higherSpeed
+        |> should be (lessThanOrEqualTo originalSpeed)
 
       Check.Quick checkFn
 

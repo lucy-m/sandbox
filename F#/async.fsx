@@ -7,8 +7,6 @@ module AsyncExample =
 
     open System.Net
     open System
-    open System.IO
-    open Microsoft.FSharp.Control.CommonExtensions
 
     // Fetch the contents of a URL asynchronously
     let fetchUrlAsync url =
