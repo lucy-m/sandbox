@@ -1,12 +1,12 @@
 <script lang="ts">
-  import TestComponent from './components/TestComponent.svelte';
+  import AllPlaylists from './components/AllPlaylists.svelte';
 
   export let name: string;
 </script>
 
 <main>
   <h1>Hello {name}!</h1>
-  <TestComponent />
+  <AllPlaylists />
 </main>
 
 <style>

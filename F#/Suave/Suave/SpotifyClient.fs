@@ -132,7 +132,7 @@ module SpotifyClient =
     spotifyGet<SearchResult> url
     |> fun sr -> sr.tracks.items
 
-  let clearTestPlaylist () =
+  let clearTestPlaylist (): unit =
     printfn $"Clearing test playlist {testPlaylistId}"
 
     let tracks = getAllPlaylistItems testPlaylistId
@@ -145,6 +145,22 @@ module SpotifyClient =
       
       body
       json jsonBody
+    }
+    |> Request.send
+    |> Response.toResult
+    |> Result.injectError (fun err ->
+      printfn $"Error getting spotify data {err}"
+    )
+    |> ignore
+
+  let addToTestPlaylist (uri: string): unit =
+    printfn $"Adding to test playlist {uri}"
+
+    let url = $"{baseUrl}/playlists/{testPlaylistId}/tracks?uris={uri}"
+
+    http {
+      POST url
+      Authorization authHeader
     }
     |> Request.send
     |> Response.toResult
