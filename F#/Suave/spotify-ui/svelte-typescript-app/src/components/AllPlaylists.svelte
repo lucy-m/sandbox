@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PlaylistModel } from '../models';
-  import Playlist from './Playlist.svelte';
+  import Playlist from './common/Playlist.svelte';
 
   const fetchData: Promise<PlaylistModel[]> = (async () => {
     const response = await fetch('http://localhost:8080/playlists');

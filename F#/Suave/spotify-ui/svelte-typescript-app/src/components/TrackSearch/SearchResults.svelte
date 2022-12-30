@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Track from '../common/Track.svelte';
   import type { StoreState } from './stores';
 
   export let searchResults: StoreState;
@@ -11,5 +12,17 @@
 {:else if searchResults.kind === 'error'}
   <p>There was an error: {searchResults.message}</p>
 {:else}
-  <p>{JSON.stringify(searchResults.data)}</p>
+  <div class="items-wrapper">
+    {#each searchResults.data as track}
+      <Track {track} />
+    {/each}
+  </div>
 {/if}
+
+<style>
+  .items-wrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+  }
+</style>
