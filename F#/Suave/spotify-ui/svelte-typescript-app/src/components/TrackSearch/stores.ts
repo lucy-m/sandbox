@@ -34,6 +34,7 @@ export const trackSearchStore = (apiService: ApiService) => {
     share()
   );
   const loading$ = textSearchSubject.pipe(
+    distinctUntilChanged(),
     map(() => ({ kind: 'loading' } as StoreState))
   );
 
