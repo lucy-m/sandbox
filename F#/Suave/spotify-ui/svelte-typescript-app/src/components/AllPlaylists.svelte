@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlaylistModel } from '../models';
+  import type { PlaylistModel } from '../models';
   import Playlist from './Playlist.svelte';
 
   const fetchData: Promise<PlaylistModel[]> = (async () => {

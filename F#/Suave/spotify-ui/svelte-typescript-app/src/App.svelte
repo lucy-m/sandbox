@@ -1,12 +1,10 @@
 <script lang="ts">
-  import AllPlaylists from './components/AllPlaylists.svelte';
-
-  export let name: string;
+  import TrackSearch from './components/TrackSearch/TrackSearch.svelte';
 </script>
 
 <main>
-  <h1>Hello {name}!</h1>
-  <AllPlaylists />
+  <h1>My best spotify app</h1>
+  <TrackSearch />
 </main>
 
 <style>

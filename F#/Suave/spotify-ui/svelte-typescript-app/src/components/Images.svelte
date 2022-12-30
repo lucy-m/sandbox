@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ImageModel } from '../models';
+  import type { ImageModel } from '../models';
 
   export let images: ImageModel[];
 

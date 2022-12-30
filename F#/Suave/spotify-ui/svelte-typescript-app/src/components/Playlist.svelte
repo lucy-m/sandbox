@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlaylistModel } from '../models';
+  import type { PlaylistModel } from '../models';
   import Images from './Images.svelte';
 
   export let playlist: PlaylistModel;
