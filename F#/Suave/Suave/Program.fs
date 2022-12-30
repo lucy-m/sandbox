@@ -11,6 +11,8 @@ let toOkJson (data: 'a) =
   |> System.Text.Json.JsonSerializer.Serialize
   |> OK
 
+SpotifyClient.clearTestPlaylist()
+
 let app =
   choose [
     GET
