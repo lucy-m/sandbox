@@ -55,7 +55,6 @@ module SpotifyClient =
   let refreshToken = "AQDq-JsE9ItSXrNTjo-LNMBFiHmTgGSKv_hsfZeWHgUnoQDD_ecx2aEPRDYGu33xOjuW2zD5gClmm80IvY2nF325t7hIdxs6S-Uy66RqWTA1Q6xWgPUnqopXoLk0MobN3eo"
   let encodedClientDetails = "YjhmMTUxZjUwMWEzNGI4YTg4ZTc2NWZlMDNmY2Y2ZmQ6MDI1OTQ1MDBmOWVkNDA3N2IxZjE0NTAxMGI1YmY1YWM="
   let baseUrl = "https://api.spotify.com/v1/"
-  let testPlaylistId = "2BhCiuCLN7c8kZbXnm9uD0"
 
   let authHeader = 
     let accessToken =
@@ -132,15 +131,15 @@ module SpotifyClient =
     spotifyGet<SearchResult> url
     |> fun sr -> sr.tracks.items
 
-  let clearTestPlaylist (): unit =
-    printfn $"Clearing test playlist {testPlaylistId}"
+  let clearPlaylist (playlistId: string): unit =
+    printfn $"Clearing test playlist {playlistId}"
 
-    let tracks = getAllPlaylistItems testPlaylistId
+    let tracks = getAllPlaylistItems playlistId
     let uris = tracks |> Array.map (fun t -> {|uri = t.uri|})
     let jsonBody = {| tracks = uris |} |> JsonSerializer.Serialize
 
     http {
-      DELETE $"{baseUrl}playlists/{testPlaylistId}/tracks"
+      DELETE $"{baseUrl}playlists/{playlistId}/tracks"
       Authorization authHeader
       
       body
@@ -153,10 +152,10 @@ module SpotifyClient =
     )
     |> ignore
 
-  let addToTestPlaylist (uri: string): unit =
+  let addToPlaylist (playlistId: string) (uri: string): Result<Response, Response> =
     printfn $"Adding to test playlist {uri}"
 
-    let url = $"{baseUrl}/playlists/{testPlaylistId}/tracks?uris={uri}"
+    let url = $"{baseUrl}playlists/{playlistId}/tracks?uris={uri}"
 
     http {
       POST url
@@ -167,4 +166,3 @@ module SpotifyClient =
     |> Result.injectError (fun err ->
       printfn $"Error getting spotify data {err}"
     )
-    |> ignore

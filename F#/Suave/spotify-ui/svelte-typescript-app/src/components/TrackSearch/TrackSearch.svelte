@@ -12,8 +12,12 @@
       store.textSearchNext(value);
     }
   };
+
+  const onAdd = (uri: string) => {
+    apiService.addTrack('Luce', uri);
+  };
 </script>
 
 <h2>Track search</h2>
 <input on:keyup={onInputChange} />
-<SearchResults searchResults={$store} />
+<SearchResults searchResults={$store} {onAdd} />

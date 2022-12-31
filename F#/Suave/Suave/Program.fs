@@ -6,12 +6,13 @@ open Suave.Successful
 open SuaveTest
 open Suave.Writers
 
+let testPlaylistId = "2BhCiuCLN7c8kZbXnm9uD0"
+let trackedPlaylist = new TrackedPlaylist(testPlaylistId)
+
 let toOkJson (data: 'a) =
   data
   |> System.Text.Json.JsonSerializer.Serialize
   |> OK
-
-SpotifyClient.clearTestPlaylist()
 
 let app =
   choose [
@@ -26,6 +27,9 @@ let app =
 
       pathScan "/search/%s"
         (fun search -> SpotifyClient.searchForTrack search |> toOkJson)
+
+      path "/tracks" >=>
+        request (fun r -> trackedPlaylist.getPlaylistItems() |> toOkJson)
     ]
 
     POST
@@ -33,7 +37,7 @@ let app =
     >=> choose [
       pathScan "/user/%s/add-track/%s"
         (fun (userName, uri) ->
-          SpotifyClient.addToTestPlaylist uri
+          trackedPlaylist.addToPlaylist userName uri
           OK ""
         )
     ]

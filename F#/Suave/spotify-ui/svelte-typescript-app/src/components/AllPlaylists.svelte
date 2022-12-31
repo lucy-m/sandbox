@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PlaylistModel } from '../models';
   import Playlist from './common/Playlist.svelte';
+  import Stack from './common/Stack.svelte';
 
   const fetchData: Promise<PlaylistModel[]> = (async () => {
     const response = await fetch('http://localhost:8080/playlists');
@@ -8,7 +9,7 @@
   })();
 </script>
 
-<div class="items-wrapper">
+<Stack>
   {#await fetchData}
     <p>Fetching playlists</p>
   {:then data}
@@ -18,12 +19,4 @@
   {:catch error}
     <p>An error occurred {error}</p>
   {/await}
-</div>
-
-<style>
-  .items-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-  }
-</style>
+</Stack>

@@ -1,9 +1,11 @@
 <script lang="ts">
+  import TrackedTest from './components/TrackedTest/TrackedTest.svelte';
   import TrackSearch from './components/TrackSearch/TrackSearch.svelte';
 </script>
 
 <main>
   <h1>My best spotify app</h1>
+  <TrackedTest />
   <TrackSearch />
 </main>
 

@@ -1,8 +1,10 @@
 <script lang="ts">
+  import Stack from '../common/Stack.svelte';
   import Track from '../common/Track.svelte';
   import type { StoreState } from './stores';
 
   export let searchResults: StoreState;
+  export let onAdd: (uri: string) => void;
 </script>
 
 {#if searchResults.kind === 'initial'}
@@ -12,17 +14,11 @@
 {:else if searchResults.kind === 'error'}
   <p>There was an error: {searchResults.message}</p>
 {:else}
-  <div class="items-wrapper">
+  <Stack>
     {#each searchResults.data as track}
-      <Track {track} />
+      <Track {track}>
+        <button slot="action" on:click={() => onAdd(track.uri)}>Add</button>
+      </Track>
     {/each}
-  </div>
+  </Stack>
 {/if}
-
-<style>
-  .items-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-  }
-</style>

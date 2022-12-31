@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { albumModelSchema } from './album';
 import { artistModelSchema } from './artist';
 
-export const trackModelSchema = z.object({
+export const trackSchema = z.object({
   id: z.string(),
   uri: z.string(),
   name: z.string(),
@@ -10,4 +10,4 @@ export const trackModelSchema = z.object({
   album: albumModelSchema,
 });
 
-export type TrackModel = z.infer<typeof trackModelSchema>;
+export type TrackModel = z.infer<typeof trackSchema>;

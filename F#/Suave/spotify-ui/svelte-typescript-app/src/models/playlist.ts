@@ -1,4 +1,4 @@
-import { ImageModel } from './image';
+import type { ImageModel } from './image';
 
 export interface PlaylistModel {
   id: string;
