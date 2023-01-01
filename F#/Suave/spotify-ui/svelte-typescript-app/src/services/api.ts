@@ -2,6 +2,7 @@ import { Observable, ReplaySubject } from 'rxjs';
 import { z } from 'zod';
 import { trackSchema, type TrackModel } from '../models/track';
 import type { TrackedTrackModel } from '../models/trackedTrack';
+import { translateErrorMessage } from '../utils/error-messages';
 import { webSocketMessageSchema } from './webSocketMessage';
 
 export interface ApiService {
@@ -33,6 +34,14 @@ export const makeApiService = (
     }
   });
 
+  const checkForError = (res: Response) => {
+    if (!res.ok) {
+      return res.text().then((errText) => {
+        onError(translateErrorMessage(errText));
+      });
+    }
+  };
+
   const searchForTracks = (search: string) => {
     const url = baseUrl + 'search/' + search;
 
@@ -44,7 +53,7 @@ export const makeApiService = (
   const addTrack = (uri: string) => {
     const url = baseUrl + `user/${userName}/track/${uri}`;
 
-    return fetch(url, { method: 'POST' }).then(() => {});
+    return fetch(url, { method: 'POST' }).then(checkForError);
   };
 
   const getTracks = () => {
@@ -54,13 +63,7 @@ export const makeApiService = (
   const deleteTrack = (uri: string): Promise<void> => {
     const url = baseUrl + `user/${userName}/remove-track/${uri}`;
 
-    return fetch(url, { method: 'POST' }).then((res) => {
-      if (!res.ok) {
-        return res.text().then((errText) => {
-          onError(errText);
-        });
-      }
-    });
+    return fetch(url, { method: 'POST' }).then(checkForError);
   };
 
   return { searchForTracks, addTrack, getTracks, deleteTrack };

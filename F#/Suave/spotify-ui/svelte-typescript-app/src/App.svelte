@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Toast from './components/common/Toast.svelte';
   import NamedSections from './components/NamedSections.svelte';
   import NamePicker from './components/NamePicker/NamePicker.svelte';
   import { localStorageService } from './services';
@@ -18,6 +19,7 @@
   {:else}
     <NamePicker {onNameChosen} />
   {/if}
+  <Toast />
 </main>
 
 <style>

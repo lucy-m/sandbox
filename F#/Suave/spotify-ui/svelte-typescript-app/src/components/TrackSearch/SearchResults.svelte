@@ -1,7 +1,7 @@
 <script lang="ts">
   import Stack from '../common/Stack.svelte';
   import Track from '../common/Track.svelte';
-  import type { StoreState } from './stores';
+  import type { StoreState } from './trackSearchStore';
 
   export let searchResults: StoreState;
   export let onAdd: (uri: string) => void;

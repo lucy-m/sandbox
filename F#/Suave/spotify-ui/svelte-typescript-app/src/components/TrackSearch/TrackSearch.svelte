@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useApiService } from '../../utils/contexts';
   import SearchResults from './SearchResults.svelte';
-  import { trackSearchStore } from './stores';
+  import { trackSearchStore } from './trackSearchStore';
 
   const apiService = useApiService();
   const store = trackSearchStore();
