@@ -1,6 +1,6 @@
 <script lang="ts">
   import { makeApiService } from '../services/api';
-  import { setApiService } from '../utils/contexts';
+  import { setApiService, setUserName } from '../utils/contexts';
   import PlaylistTracks from './PlaylistTracks/PlaylistTracks.svelte';
   import TrackSearch from './TrackSearch/TrackSearch.svelte';
 
@@ -9,6 +9,7 @@
   const onError = (msg: string) => console.error(msg);
 
   setApiService(makeApiService(name, onError));
+  setUserName(name);
 </script>
 
 <p>Welcome {name}</p>

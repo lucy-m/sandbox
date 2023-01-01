@@ -38,16 +38,21 @@ module TrackedPlaylist =
       |> Observable.map this.getPlaylistItems
 
     member this.addToPlaylist (addedBy: string) (uri: string): Result<unit, string> =
-      let addResult = SpotifyClient.addToPlaylist id uri
-      match addResult with
-      | Ok _ ->
-        let trackingInfo: TrackingInfo = {
-          addedBy = addedBy
-        }
-        trackMap <- trackMap |> Map.add uri trackingInfo
-        updateSubject.OnNext()
-        Ok ()
-      | Error _ -> ErrorResults.spotifyError
+      let alreadyExists = trackMap |> Map.tryFind uri |> Option.isSome
+
+      if alreadyExists
+      then ErrorResults.alreadyAdded
+      else
+        let addResult = SpotifyClient.addToPlaylist id uri
+        match addResult with
+        | Ok _ ->
+          let trackingInfo: TrackingInfo = {
+            addedBy = addedBy
+          }
+          trackMap <- trackMap |> Map.add uri trackingInfo
+          updateSubject.OnNext()
+          Ok ()
+        | Error _ -> ErrorResults.spotifyError
 
     member this.removeFromPlaylist (removedBy: string) (uri: string): Result<unit, string> =
       let addedBy = trackMap |> Map.tryFind uri |> Option.map (fun i -> i.addedBy)

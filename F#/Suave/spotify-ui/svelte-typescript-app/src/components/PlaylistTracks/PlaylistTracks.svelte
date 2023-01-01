@@ -1,14 +1,26 @@
 <script lang="ts">
-  import { useApiService } from '../../utils/contexts';
+  import type { TrackedTrackModel } from '../../models/trackedTrack';
+  import { useApiService, useUserName } from '../../utils/contexts';
   import { subscriberStore } from '../../utils/subscriberStore';
   import Stack from '../common/Stack.svelte';
   import Track from '../common/Track.svelte';
 
   const apiService = useApiService();
   const tracks = subscriberStore(apiService.getTracks());
+  const userName = useUserName();
 
-  const onDelete = (uri: string) => {
-    apiService.deleteTrack(uri);
+  const canDelete = (t: TrackedTrackModel): boolean => {
+    if (t.info?.addedBy && userName) {
+      return t.info.addedBy === userName;
+    } else {
+      return false;
+    }
+  };
+
+  const onDelete = (t: TrackedTrackModel) => {
+    if (canDelete(t)) {
+      apiService.deleteTrack(t.track.uri);
+    }
   };
 </script>
 
@@ -23,7 +35,11 @@
           <p slot="additional-text">
             Added by {track.info?.addedBy ?? 'Unknown'}
           </p>
-          <button slot="action" on:click={() => onDelete(track.track.uri)}>
+          <button
+            slot="action"
+            disabled={!canDelete(track)}
+            on:click={() => onDelete(track)}
+          >
             Delete
           </button>
         </Track>

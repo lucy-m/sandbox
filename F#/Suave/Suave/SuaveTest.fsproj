@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="ErrorType.fs" />
+    <Compile Include="ErrorResults.fs" />
     <Compile Include="SpotifyClient.fs" />
     <Compile Include="TrackedPlaylist.fs" />
     <Compile Include="WebSocketMessages.fs" />
