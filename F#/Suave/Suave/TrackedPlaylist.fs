@@ -37,7 +37,7 @@ module TrackedPlaylist =
       updateSubject :> IObservable<unit>
       |> Observable.map this.getPlaylistItems
 
-    member this.addToPlaylist (addedBy: string) (uri: string): unit =
+    member this.addToPlaylist (addedBy: string) (uri: string): Result<unit, string> =
       let addResult = SpotifyClient.addToPlaylist id uri
       match addResult with
       | Ok _ ->
@@ -46,6 +46,22 @@ module TrackedPlaylist =
         }
         trackMap <- trackMap |> Map.add uri trackingInfo
         updateSubject.OnNext()
-      | _ -> ()
+        Ok ()
+      | Error _ -> ErrorResults.spotifyError
+
+    member this.removeFromPlaylist (removedBy: string) (uri: string): Result<unit, string> =
+      let addedBy = trackMap |> Map.tryFind uri |> Option.map (fun i -> i.addedBy)
+
+      if addedBy = Some removedBy
+      then
+        let removeResult = SpotifyClient.removeFromPlaylist id uri
+
+        match removeResult with
+        | Ok _ ->
+          trackMap <- trackMap |> Map.remove uri
+          updateSubject.OnNext()
+          Ok ()
+        | Error _ -> ErrorResults.spotifyError
+      else ErrorResults.wrongUser
 
 type TrackedPlaylist = TrackedPlaylist.Model

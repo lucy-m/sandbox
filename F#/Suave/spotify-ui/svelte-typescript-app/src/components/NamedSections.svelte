@@ -6,7 +6,9 @@
 
   export let name: string;
 
-  setApiService(makeApiService(name));
+  const onError = (msg: string) => console.error(msg);
+
+  setApiService(makeApiService(name, onError));
 </script>
 
 <p>Welcome {name}</p>

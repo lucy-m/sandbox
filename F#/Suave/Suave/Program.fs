@@ -9,6 +9,7 @@ open Suave.Sockets.Control
 open SuaveTest
 open Suave.Writers
 open System.Text.Json
+open Suave.RequestErrors
 
 let testPlaylistId = "2BhCiuCLN7c8kZbXnm9uD0"
 let trackedPlaylist = new TrackedPlaylist(testPlaylistId)
@@ -47,6 +48,11 @@ let ws (webSocket : WebSocket) (context: HttpContext) =
         | _ -> ()
   }
 
+let mapResult (r: Result<unit, string>): WebPart =
+  match r with
+  | Ok _ -> OK ""
+  | Error message -> BAD_REQUEST message
+
 let app =
   choose [
     path "/websocket" >=> handShake ws
@@ -70,10 +76,28 @@ let app =
     POST
     >=> addHeader "Access-Control-Allow-Origin" "*"
     >=> choose [
-      pathScan "/user/%s/add-track/%s"
+      pathScan "/user/%s/track/%s"
         (fun (userName, uri) ->
           trackedPlaylist.addToPlaylist userName uri
-          OK ""
+          |> mapResult
+        )
+      
+      pathScan "/user/%s/remove-track/%s"
+        (fun (userName, uri) ->
+          printfn $"Delete request from {userName} of {uri}"
+          trackedPlaylist.removeFromPlaylist userName uri
+          |> mapResult
+        )
+    ]
+
+    DELETE
+    >=> addHeader "Access-Control-Allow-Origin" "*"
+    >=> choose [
+      pathScan "/user/%s/remove-track/%s"
+        (fun (userName, uri) ->
+          printfn $"Delete request from {userName} of {uri}"
+          trackedPlaylist.removeFromPlaylist userName uri
+          |> mapResult
         )
     ]
   ]

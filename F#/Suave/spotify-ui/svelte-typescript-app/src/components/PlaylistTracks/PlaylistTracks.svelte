@@ -6,6 +6,10 @@
 
   const apiService = useApiService();
   const tracks = subscriberStore(apiService.getTracks());
+
+  const onDelete = (uri: string) => {
+    apiService.deleteTrack(uri);
+  };
 </script>
 
 <div>
@@ -19,7 +23,9 @@
           <p slot="additional-text">
             Added by {track.info?.addedBy ?? 'Unknown'}
           </p>
-          <button slot="action"> Click! </button>
+          <button slot="action" on:click={() => onDelete(track.track.uri)}>
+            Delete
+          </button>
         </Track>
       {/each}
     </Stack>

@@ -30,7 +30,6 @@ module SpotifyClient =
   }
   
   type Track = {
-    id: string
     uri: string
     name: string
     artists: Artist []
@@ -153,8 +152,6 @@ module SpotifyClient =
     |> ignore
 
   let addToPlaylist (playlistId: string) (uri: string): Result<Response, Response> =
-    printfn $"Adding to test playlist {uri}"
-
     let url = $"{baseUrl}playlists/{playlistId}/tracks?uris={uri}"
 
     http {
@@ -164,5 +161,29 @@ module SpotifyClient =
     |> Request.send
     |> Response.toResult
     |> Result.injectError (fun err ->
-      printfn $"Error getting spotify data {err}"
+      printfn $"Error adding track to playlist {err}"
+    )
+
+  let removeFromPlaylist (playlistId: string) (uri: string): Result<Response, Response> =
+    let url = $"{baseUrl}playlists/{playlistId}/tracks"
+    let jsonBody =
+      {| 
+        tracks = 
+          [|
+            {|uri = uri|}
+          |]
+      |}
+      |> JsonSerializer.Serialize
+
+    http {
+      DELETE url
+      Authorization authHeader
+
+      body
+      json jsonBody
+    }
+    |> Request.send
+    |> Response.toResult
+    |> Result.injectError (fun err ->
+      printfn $"Error removing track from playlist {err}"
     )
