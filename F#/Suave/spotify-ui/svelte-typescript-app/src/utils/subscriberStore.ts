@@ -10,7 +10,7 @@ export const subscriberStore = <T>(source$: Observable<T>) => {
   return readable<SubscriberState<T>>({ kind: 'initial' }, (set) => {
     const sub = source$.subscribe({
       next: (data) => set({ kind: 'data', data }),
-      error: (err) => set({ kind: 'error' }),
+      error: () => set({ kind: 'error' }),
     });
     return () => sub.unsubscribe();
   });

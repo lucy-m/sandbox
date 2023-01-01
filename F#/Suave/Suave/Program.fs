@@ -22,7 +22,7 @@ let ws (webSocket : WebSocket) (context: HttpContext) =
   socket {
     let mutable loop = true
 
-    let playlistItems = 
+    use playlistItems = 
       trackedPlaylist
         .playlistItemsStream()
         .Subscribe(
@@ -43,11 +43,7 @@ let ws (webSocket : WebSocket) (context: HttpContext) =
     
         match msg with
         | (Close, _, _) ->
-            let emptyResponse = [||] |> ByteSegment
-            do! webSocket.send Close emptyResponse true
-            playlistItems.Dispose()
-            loop <- false
-    
+          loop <- false
         | _ -> ()
   }
 
