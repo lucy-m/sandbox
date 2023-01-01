@@ -1,12 +1,23 @@
 <script lang="ts">
-  import TrackedTest from './components/TrackedTest/TrackedTest.svelte';
-  import TrackSearch from './components/TrackSearch/TrackSearch.svelte';
+  import NamedSections from './components/NamedSections.svelte';
+  import NamePicker from './components/NamePicker/NamePicker.svelte';
+  import { localStorageService } from './services';
+
+  let name: string | undefined = localStorageService.getName();
+
+  const onNameChosen = (s: string) => {
+    localStorageService.setName(s);
+    name = s;
+  };
 </script>
 
 <main>
   <h1>My best spotify app</h1>
-  <TrackedTest />
-  <TrackSearch />
+  {#if name}
+    <NamedSections {name} />
+  {:else}
+    <NamePicker {onNameChosen} />
+  {/if}
 </main>
 
 <style>

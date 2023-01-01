@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { apiService } from '../../services/api';
+  import { useApiService } from '../../utils/contexts';
   import SearchResults from './SearchResults.svelte';
   import { trackSearchStore } from './stores';
 
-  const store = trackSearchStore(apiService);
+  const apiService = useApiService();
+  const store = trackSearchStore();
 
   const onInputChange = (e: any) => {
     const value = e.target?.value;
@@ -14,7 +15,7 @@
   };
 
   const onAdd = (uri: string) => {
-    apiService.addTrack('Luce', uri);
+    apiService.addTrack(uri);
   };
 </script>
 

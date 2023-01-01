@@ -1,31 +1,15 @@
 <script lang="ts">
-  import { readable } from 'svelte/store';
-  import type { TrackedTrackModel } from '../../models/trackedTrack';
-  import { apiService } from '../../services/api';
+  import { useApiService } from '../../utils/contexts';
   import { subscriberStore } from '../../utils/subscriberStore';
   import Stack from '../common/Stack.svelte';
   import Track from '../common/Track.svelte';
 
+  const apiService = useApiService();
   const tracks = subscriberStore(apiService.getTracks());
-
-  const uris = [
-    'spotify:track:30nxyjRmkxXJSs5CLiUZQt',
-    'spotify:track:0gchQwxmBWj5no8NJ8b2yH',
-    'spotify:track:0XHqKfHasV3bs5RHaVC50O',
-  ];
-
-  const addSong = (uri: string) => apiService.addTrack('Ash', uri);
 </script>
 
 <div>
-  <div>
-    <p>Add songs!</p>
-    {#each uris as uri}
-      <button on:click={() => addSong(uri)}>
-        {uri}
-      </button>
-    {/each}
-  </div>
+  <h2>Playlist tracks</h2>
   {#if $tracks.kind === 'initial'}
     <p>Fetching tracks</p>
   {:else if $tracks.kind === 'data'}

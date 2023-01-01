@@ -6,11 +6,11 @@ import { webSocketMessageSchema } from './webSocketMessage';
 
 export interface ApiService {
   searchForTracks: (search: string) => Promise<TrackModel[]>;
-  addTrack: (userName: string, uri: string) => Promise<void>;
+  addTrack: (uri: string) => Promise<void>;
   getTracks: () => Observable<TrackedTrackModel[]>;
 }
 
-export const apiService: ApiService = (() => {
+export const makeApiService = (userName: string): ApiService => {
   const baseUrl = 'http://localhost:8080/';
   const socket = new WebSocket('ws://localhost:8080/websocket');
 
@@ -37,7 +37,7 @@ export const apiService: ApiService = (() => {
       .then((json) => z.array(trackSchema).parse(json));
   };
 
-  const addTrack = (userName: string, uri: string) => {
+  const addTrack = (uri: string) => {
     const url = baseUrl + `user/${userName}/add-track/${uri}`;
 
     return fetch(url, { method: 'POST' }).then(() => {});
@@ -48,4 +48,4 @@ export const apiService: ApiService = (() => {
   };
 
   return { searchForTracks, addTrack, getTracks };
-})();
+};

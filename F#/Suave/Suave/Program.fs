@@ -34,7 +34,8 @@ let ws (webSocket : WebSocket) (context: HttpContext) =
               |> System.Text.Encoding.UTF8.GetBytes
               |> ByteSegment
 
-            do webSocket.send Text byteResponse true |> Async.RunSynchronously
+            do webSocket.send Text byteResponse true
+                |> Async.RunSynchronously
         )
     
     while loop do

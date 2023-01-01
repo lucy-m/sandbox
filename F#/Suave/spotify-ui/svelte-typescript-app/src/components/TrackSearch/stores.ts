@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 import { readable } from 'svelte/store';
 import type { TrackModel } from '../../models/track';
-import type { ApiService } from '../../services/api';
+import { useApiService } from '../../utils/contexts';
 
 export type StoreState =
   | { kind: 'initial' }
@@ -19,7 +19,8 @@ export type StoreState =
   | { kind: 'error'; message: string }
   | { kind: 'data'; data: TrackModel[] };
 
-export const trackSearchStore = (apiService: ApiService) => {
+export const trackSearchStore = () => {
+  const apiService = useApiService();
   const textSearchSubject = new Subject<string>();
   const searchString$ = textSearchSubject.pipe(
     distinctUntilChanged(),
