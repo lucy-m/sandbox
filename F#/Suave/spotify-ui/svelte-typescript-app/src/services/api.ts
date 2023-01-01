@@ -1,18 +1,33 @@
-import { type TrackModel, trackSchema } from '../models/track';
+import { Observable, ReplaySubject } from 'rxjs';
 import { z } from 'zod';
-import {
-  trackedTrackSchema,
-  type TrackedTrackModel,
-} from '../models/trackedTrack';
+import { trackSchema, type TrackModel } from '../models/track';
+import type { TrackedTrackModel } from '../models/trackedTrack';
+import { webSocketMessageSchema } from './webSocketMessage';
 
 export interface ApiService {
   searchForTracks: (search: string) => Promise<TrackModel[]>;
   addTrack: (userName: string, uri: string) => Promise<void>;
-  getTracks: () => Promise<TrackedTrackModel[]>;
+  getTracks: () => Observable<TrackedTrackModel[]>;
 }
 
 export const apiService: ApiService = (() => {
   const baseUrl = 'http://localhost:8080/';
+  const socket = new WebSocket('ws://localhost:8080/websocket');
+
+  const tracks = new ReplaySubject<TrackedTrackModel[]>();
+
+  // Listen for messages
+  socket.addEventListener('message', (event) => {
+    const rawEventData = JSON.parse(event.data);
+    const message = webSocketMessageSchema.safeParse(rawEventData);
+
+    if (message.success) {
+      const data: TrackedTrackModel[] = message.data.data;
+      tracks.next(data);
+    } else {
+      console.error('Unknown websocket message', event.data);
+    }
+  });
 
   const searchForTracks = (search: string) => {
     const url = baseUrl + 'search/' + search;
@@ -29,11 +44,7 @@ export const apiService: ApiService = (() => {
   };
 
   const getTracks = () => {
-    const url = baseUrl + 'tracks';
-
-    return fetch(url)
-      .then((response) => response.json())
-      .then((json) => z.array(trackedTrackSchema).parse(json));
+    return tracks;
   };
 
   return { searchForTracks, addTrack, getTracks };

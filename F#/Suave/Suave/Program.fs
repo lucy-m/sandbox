@@ -2,20 +2,58 @@
 open Suave.Filters
 open Suave.Operators
 open Suave.Successful
+open Suave.WebSocket
+open Suave.Sockets
+open Suave.Sockets.Control
 
 open SuaveTest
 open Suave.Writers
+open System.Text.Json
 
 let testPlaylistId = "2BhCiuCLN7c8kZbXnm9uD0"
 let trackedPlaylist = new TrackedPlaylist(testPlaylistId)
 
 let toOkJson (data: 'a) =
   data
-  |> System.Text.Json.JsonSerializer.Serialize
+  |> JsonSerializer.Serialize
   |> OK
+
+let ws (webSocket : WebSocket) (context: HttpContext) =
+  socket {
+    let mutable loop = true
+
+    let playlistItems = 
+      trackedPlaylist
+        .playlistItemsStream()
+        .Subscribe(
+          fun items ->
+            let byteResponse =
+              items
+              |> WebSocketMessages.playlistItems
+              |> JsonSerializer.Serialize
+              |> System.Text.Encoding.UTF8.GetBytes
+              |> ByteSegment
+
+            do webSocket.send Text byteResponse true |> Async.RunSynchronously
+        )
+    
+    while loop do
+        let! msg = webSocket.read()
+    
+        match msg with
+        | (Close, _, _) ->
+            let emptyResponse = [||] |> ByteSegment
+            do! webSocket.send Close emptyResponse true
+            playlistItems.Dispose()
+            loop <- false
+    
+        | _ -> ()
+  }
 
 let app =
   choose [
+    path "/websocket" >=> handShake ws
+
     GET
     >=> addHeader "Access-Control-Allow-Origin" "*"
     >=> choose [ 

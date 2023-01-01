@@ -8,12 +8,14 @@
   <ItemGroup>
     <Compile Include="SpotifyClient.fs" />
     <Compile Include="TrackedPlaylist.fs" />
+    <Compile Include="WebSocketMessages.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FsHttp" Version="10.0.0" />
     <PackageReference Include="Suave" Version="2.6.2" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { readable } from 'svelte/store';
+  import type { TrackedTrackModel } from '../../models/trackedTrack';
   import { apiService } from '../../services/api';
+  import { subscriberStore } from '../../utils/subscriberStore';
   import Stack from '../common/Stack.svelte';
   import Track from '../common/Track.svelte';
 
-  const tracks = apiService.getTracks();
+  const tracks = subscriberStore(apiService.getTracks());
 
   const uris = [
     'spotify:track:30nxyjRmkxXJSs5CLiUZQt',
@@ -23,11 +26,11 @@
       </button>
     {/each}
   </div>
-  {#await tracks}
+  {#if $tracks.kind === 'initial'}
     <p>Fetching tracks</p>
-  {:then data}
+  {:else if $tracks.kind === 'data'}
     <Stack>
-      {#each data as track}
+      {#each $tracks.data as track}
         <Track track={track.track}>
           <p slot="additional-text">
             Added by {track.info?.addedBy ?? 'Unknown'}
@@ -36,7 +39,7 @@
         </Track>
       {/each}
     </Stack>
-  {:catch error}
-    <p>An error occurred {error}</p>
-  {/await}
+  {:else if $tracks.kind === 'error'}
+    <p>Couldn't load tracks 😔</p>
+  {/if}
 </div>

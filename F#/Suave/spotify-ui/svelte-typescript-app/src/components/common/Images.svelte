@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ImageModel } from '../models';
+  import type { ImageModel } from '../../models';
 
-  export let images: ImageModel[]; 
+  export let images: ImageModel[];
 
   $: firstImage = images[0];
 </script>
