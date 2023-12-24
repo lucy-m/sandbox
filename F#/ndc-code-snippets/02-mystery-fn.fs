@@ -17,6 +17,12 @@ let ``works for [1; 2; 3]`` () =
     mysteryified |> should equal [3; 2; 1]
 
 [<Test>]
+let ``works for []`` () =
+    let list = []
+    let mysteryified = mysteryFn list
+    mysteryified |> should be Empty
+
+[<Test>]
 let ``works for [6; 7; 8]`` () =
     let list = [6; 7; 8]
     let mysteryified = mysteryFn list

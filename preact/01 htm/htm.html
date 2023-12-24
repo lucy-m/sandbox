@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preact with HTM</title>
+</head>
+<script type="module">
+  import { h, render } from "https://esm.sh/preact";
+  import htm from "https://esm.sh/htm";
+  import { Button } from "./button.mjs";
+
+  // Initialize htm with Preact
+  const html = htm.bind(h);
+
+  function App (props) {
+    return html`<h1> Hello ${props.name}!</h1>`;
+  }
+
+  console.log(App);
+
+  render(html`<${App} name="World" />`, document.body);
+
+  const buttonTarget = document.querySelector("#button-target");
+  new Button(buttonTarget, { label: "My button"});
+</script>
+<body>
+  <div id="button-target" />
+</body>
+</html>

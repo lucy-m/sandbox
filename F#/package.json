@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "fast-check": "^3.6.2",
+    "ts-node": "^10.9.1"
+  }
+}

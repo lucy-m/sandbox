@@ -3,7 +3,7 @@ type PhysicalProperties = {
   weight: double
 }
 
-type MovingObject = {
+type MovingItem = {
   position: double * double
   velocity: double * double
   properties: PhysicalProperties
