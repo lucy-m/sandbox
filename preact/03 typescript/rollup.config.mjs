@@ -1,3 +1,4 @@
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 
 /** @type {import('rollup').RollupOptions} */
@@ -6,7 +7,7 @@ const options = {
   output: {
     dir: "dist",
   },
-  plugins: [typescript()],
+  plugins: [typescript(), nodeResolve()],
 };
 
 export default options;

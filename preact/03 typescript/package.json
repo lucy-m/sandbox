@@ -2,7 +2,8 @@
   "name": "03-typescript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": "./dist",
+  "files": ["./dist"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c rollup.config.mjs"
@@ -11,9 +12,13 @@
   "author": "= <=>",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.5",
     "rollup": "^4.9.1",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "preact": "^10.19.3"
   }
 }
