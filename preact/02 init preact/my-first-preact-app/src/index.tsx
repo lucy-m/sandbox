@@ -1,5 +1,5 @@
+import { Button } from "03-typescript";
 import { render } from "preact";
-import { Button } from "./Button";
 import { Counter } from "./Signal";
 import { TodoList } from "./TodoList";
 import "./style.css";

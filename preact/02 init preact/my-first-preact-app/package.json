@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@preact/signals": "^1.2.2",
+		"03-typescript": "file:03-typescript-1.0.2.tgz",
 		"preact": "^10.13.1"
 	},
 	"devDependencies": {
