@@ -1,0 +1,14 @@
+{
+  "name": "@nx-svelte/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {},
+  "private": true,
+  "devDependencies": {
+    "@nx/js": "17.0.1",
+    "@nx/workspace": "17.0.1",
+    "@nxext/svelte": "^17.0.1",
+    "nx": "17.0.1",
+    "typescript": "^5.1.6"
+  }
+}
