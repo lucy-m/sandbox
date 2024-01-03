@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <svg id="arrow" height="160" style="transform: translate(100px, 100px);
+  transition: all 400ms">
+    <path d="M 1 41 l 198 0, 0 -40, 100 80, -100 80, 0 -40, -198 0, 0 -80" stroke="black" fill="transparent" />
+  </svg>
+</body>
+<script>
+  let left = false; 
+  const arrow = document.getElementById("arrow");
+  arrow.addEventListener("click", () => {
+    const rotate = left ? 0 : 180;
+    left = !left;
+  arrow.style.transform = `translate(100px, 100px) rotateY(${rotate}deg)`
+  });
+  </script>
+</html>

@@ -1,30 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preact with HTM</title>
-</head>
-<script type="module">
-  import { h, render } from "https://esm.sh/preact";
-  import htm from "https://esm.sh/htm";
-  import { Button } from "./button.mjs";
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preact with HTM</title>
+  </head>
+  <script type="module">
+    import { h, render } from "https://esm.sh/preact";
+    import { signal } from "https://esm.sh/@preact/signals";
+    import htm from "https://esm.sh/htm";
+    import { Button } from "./button.mjs";
+    import { Button as Button03, mountButton } from "./03-typescript.mjs";
 
-  // Initialize htm with Preact
-  const html = htm.bind(h);
+    // Initialize htm with Preact
+    const html = htm.bind(h);
 
-  function App (props) {
-    return html`<h1> Hello ${props.name}!</h1>`;
-  }
+    function App(props) {
+      return html`<h1>Hello ${props.name}!</h1>`;
+    }
 
-  console.log(App);
+    render(html`<${App} name="World" />`, document.body);
 
-  render(html`<${App} name="World" />`, document.body);
+    const buttonTarget = document.querySelector("#button-target");
+    // new Button(buttonTarget, { label: "My button"});
 
-  const buttonTarget = document.querySelector("#button-target");
-  new Button(buttonTarget, { label: "My button"});
-</script>
-<body>
-  <div id="button-target" />
-</body>
+    const name = signal("Some button name");
+    mountButton(buttonTarget, name);
+
+    const changeButtonName = () => {
+      name.value = "New button name"
+      console.log("Button name changed")
+    }
+
+    const changeButtonTarget = document.querySelector("#change-button-target");
+    const button = html`<button onClick=${changeButtonName}>Change button name</button>`;
+    render(button, changeButtonTarget);
+
+  </script>
+  <body>
+    <div id="button-target" />
+    <div id="change-button-target" />
+  </body>
 </html>

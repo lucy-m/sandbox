@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drag HTML</title>
+  </head>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    #wrapper {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+  <body>
+    <div id="wrapper">
+      <svg
+        width="316"
+        height="176"
+        viewBox="-8 -8 316 176"
+        id="arrow"
+        style="transform-origin: 158px 88px"
+      >
+        <path
+          id="arrow-path"
+          d="M 1 41 l 198 0, 0 -40, 100 80, -100 80, 0 -40, -198 0, 0 -80"
+          stroke="black"
+          fill="transparent"
+        />
+        <g id="bounding-box">
+          <rect
+            x="0"
+            y="0"
+            width="300"
+            height="160"
+            fill="none"
+            stroke="grey"
+          />
+          <rect
+            id="scale-handle"
+            x="-8"
+            y="-8"
+            width="16"
+            height="16"
+            fill="lightblue"
+            stroke="blue"
+          />
+          <rect
+            id="rotate-handle"
+            x="292"
+            y="152"
+            width="16"
+            height="16"
+            fill="cornsilk"
+            stroke="orange"
+          />
+        </g>
+      </svg>
+      <p id="transform-display"></p>
+    </div>
+  </body>
+  <script>
+    const arrow = document.getElementById("arrow");
+    const arrowPath = document.getElementById("arrow-path");
+    const wrapper = document.getElementById("wrapper");
+    const scaleHandle = document.getElementById("scale-handle");
+    const rotateHandle = document.getElementById("rotate-handle");
+    const transformDisplay = document.getElementById("transform-display")
+
+    let translate = [40, 40];
+    let scale = 100;
+    let rotate = 0;
+
+    let translating = false;
+    let scaling = false;
+    let rotating = false;
+
+    const setTransform = () => {
+      const transform = `translate(${translate[0]}px, ${translate[1]}px) scale(${scale}%) rotate(${rotate}deg)`;
+      arrow.style.transform = transform;
+      transformDisplay.innerHTML = transform;
+    };
+
+    setTransform();
+
+    arrowPath.addEventListener("mousedown", (e) => {
+      translating = true;
+    });
+
+    scaleHandle.addEventListener("mousedown", (e) => {
+      scaling = true;
+    });
+
+    rotateHandle.addEventListener("mousedown", (e) => {
+      rotating = true;
+    });
+
+    wrapper.addEventListener("mousemove", (e) => {
+      if (translating) {
+        translate = [translate[0] + e.movementX, translate[1] + e.movementY];
+        setTransform();
+      }
+
+      if (scaling) {
+        // Not the proper logic for scaling, but it works for now
+        const avgMove = (e.movementX + e.movementY) / 4;
+        scale -= avgMove;
+        setTransform();
+      }
+
+      if (rotating) {
+        // Ideally should calculate the rotation of the movement vector
+        rotate -= e.movementX;
+        setTransform();
+      }
+    });
+
+    wrapper.addEventListener("mouseup", () => {
+      translating = false;
+      scaling = false;
+      rotating = false;
+    });
+  </script>
+</html>
