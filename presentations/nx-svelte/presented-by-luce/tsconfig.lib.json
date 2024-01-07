@@ -16,6 +16,6 @@
     "allowJs": true,
     "composite": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts", "src/**/*.svelte"],
   "exclude": ["**/*.spec.ts", "**/*_spec.ts", "public/*"]
 }

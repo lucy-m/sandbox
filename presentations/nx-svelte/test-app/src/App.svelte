@@ -1,30 +1,43 @@
 <script lang="ts">
-	export let name: string;
+  import {
+    PosFns,
+    SlideObject,
+    SlideView,
+    makeSlideObject,
+    morphSlideObject,
+  } from 'presented-by-luce';
+  import seedrandom from 'seedrandom';
+  import { writable } from 'svelte/store';
+
+  const prng = seedrandom(Math.random().toString());
+
+  const makeSlideObjectBound = makeSlideObject(prng);
+
+  const initialSlideObjects: SlideObject[] = [
+    makeSlideObjectBound({ position: PosFns.new(20, 100), color: 'darkred' }),
+    makeSlideObjectBound({ position: PosFns.new(150, 50), color: 'lightblue' }),
+  ];
+
+  const secondSlideObjects: SlideObject[] = [
+    morphSlideObject(initialSlideObjects[0], {
+      position: PosFns.new(220, 120),
+      color: 'darkred',
+    }),
+    morphSlideObject(initialSlideObjects[1], {
+      position: PosFns.new(110, 30),
+      color: 'lightblue',
+    }),
+  ];
+
+  const slideObjects = writable<SlideObject[]>(initialSlideObjects);
 </script>
 
 <main>
-	<h1>Welcome {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+  <button
+    on:click={() => {
+      slideObjects.set(secondSlideObjects);
+    }}>Next</button
+  >
+
+  <SlideView slideObjects={$slideObjects} />
 </main>
-
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>
