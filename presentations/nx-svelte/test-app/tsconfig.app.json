@@ -12,16 +12,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "checkJs": true,
-    "allowJs": true
+    "allowJs": true,
+    "composite": true
   },
   "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.svelte"
   ]
 }
