@@ -1,2 +1,4 @@
 obj
 bin
+.nx
+node_modules
