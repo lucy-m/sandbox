@@ -15,7 +15,7 @@ export const setOutlineThickness = mapObjectToTaggedStyle("luce-theme-outline-th
 });
 
 export const themeColors = {
-  color1: "#057AB8",
+  color1: "#F57AB8",
   color2: "#46DB9D",
   svelte: "#f77a31",
   dark: "#000000",
