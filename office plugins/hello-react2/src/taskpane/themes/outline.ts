@@ -1,4 +1,9 @@
 import { mapObjectToTaggedStyle } from "./map-object-to-tagged-style";
+import { registerTaggedStyler } from "./tagged-styles";
+
+export const clearOutline = registerTaggedStyler("luce-theme-outline-thickness", "none", (shape) => {
+  shape.lineFormat.visible = false;
+});
 
 const weights = {
   thin: 2,
@@ -10,9 +15,10 @@ export const setOutlineThickness = mapObjectToTaggedStyle("luce-theme-outline-th
 });
 
 export const themeColors = {
-  color1: "#F57AB8",
+  color1: "#057AB8",
   color2: "#46DB9D",
-  color3: "#E3B868",
+  svelte: "#f77a31",
+  dark: "#000000",
 };
 
 export const setOutlineColor = mapObjectToTaggedStyle("luce-theme-outline-color", themeColors, (color, shape) => {

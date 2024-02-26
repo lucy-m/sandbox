@@ -1,5 +1,14 @@
 import * as React from "react";
-import { setMargin, setOutlineColor, setOutlineThickness, syncTaggedStyles, themeColors } from "../themes";
+import {
+  clearOutline,
+  setMargin,
+  setOutlineColor,
+  setOutlineThickness,
+  syncTaggedStyles,
+  themeColors,
+} from "../themes";
+import { clearFill, fillColors, setFill } from "../themes/fill";
+import { setTextColor, textColors } from "../themes/textColor";
 
 /* global console, Office, PowerPoint */
 
@@ -74,7 +83,6 @@ const App: React.FC = () => {
   const applyToSelected = (doApply: (s: PowerPoint.Shape) => void) => () => {
     PowerPoint.run(async (context) => {
       const shapes = context.presentation.getSelectedShapes();
-      shapes.load("items");
       await context.sync();
 
       shapes.items.forEach((shape) => {
@@ -93,9 +101,11 @@ const App: React.FC = () => {
           <button onClick={applyToSelected(setMargin.standard)}>Standard</button>
         </div>
       </div>
+
       <div className="v-stack">
         <h2>Outline</h2>
         <div className="h-stack">
+          <button onClick={applyToSelected(clearOutline)}>None</button>
           <button onClick={applyToSelected(setOutlineThickness.thin)}>Thin</button>
           <button onClick={applyToSelected(setOutlineThickness.chunky)}>Chunky</button>
         </div>
@@ -110,10 +120,43 @@ const App: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <div className="v-stack">
+        <h2>Fill</h2>
+        <div className="h-stack">
+          <button onClick={applyToSelected(clearFill)}>Clear</button>
+        </div>
+        <div className="h-stack">
+          {Object.entries(fillColors).map(([key, value]) => (
+            <button
+              className="color-button"
+              key={key}
+              style={{ backgroundColor: value }}
+              onClick={applyToSelected(setFill[key])}
+            ></button>
+          ))}
+        </div>
+      </div>
+
+      <div className="v-stack">
+        <h2>Text color</h2>
+        <div className="h-stack">
+          {Object.entries(textColors).map(([key, value]) => (
+            <button
+              className="color-button"
+              key={key}
+              style={{ backgroundColor: value }}
+              onClick={applyToSelected(setTextColor[key])}
+            ></button>
+          ))}
+        </div>
+      </div>
+
       <div className="v-stack">
         <h2>Sync</h2>
         <button onClick={syncTaggedStyles}>Sync styles</button>
       </div>
+
       <div className="v-stack">
         <h2>Misc experiments</h2>
         <button onClick={onClick}>Say hello!</button>
